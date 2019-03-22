@@ -5,7 +5,8 @@ function time = input_n_density01(n, method)
 %   algebra and Exponential sums", by G. Masetti, L. Robol, S. Chiaradonna,
 %   F. Di Giandomenico, submitted.
 
-  topology = full((eye(n,n)+sprand(n,n, 1 / n)) > 0)
+%  topology = full((eye(n,n)+sprand(n,n, 1 / n)) > 0)
+topology(createTopology(n, 0.5));
 
   pp = symrcm(topology);
 
@@ -30,7 +31,7 @@ function time = input_n_density01(n, method)
   end
 
   if strcmp(method, 'ttexpsums2')
-    [m, time] = computeMTTF(R, W, 1e-8, 1e-3, method, true);
+    [m, time] = computeMTTF(R, W, 1e-6, 1e-3, method, true);
   else
     [m, time] = computeMTTF(R, W, 1e-6, 1e-3, method, true);
   end
