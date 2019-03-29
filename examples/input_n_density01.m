@@ -6,7 +6,7 @@ function time = input_n_density01(n, method)
 %   F. Di Giandomenico, submitted.
 
 %  topology = full((eye(n,n)+sprand(n,n, 1 / n)) > 0)
-topology(createTopology(n, 0.5));
+topology = createTopology(n, 0.5);
 
   pp = symrcm(topology);
 
