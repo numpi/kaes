@@ -95,7 +95,7 @@ if exist('Wsync', 'var')
 else
     A2 = round(Delta - Deltap, ttol);
 end
-    
+
 D = Deltap;
 
 pi0 = createpi0(n);
