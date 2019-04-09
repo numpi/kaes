@@ -95,7 +95,7 @@ if exist('Wsync', 'var')
 else
     A2 = round(Delta - Deltap, ttol);
 end
-    
+
 D = Deltap;
 
 pi0 = createpi0(n);
@@ -310,6 +310,59 @@ switch method
         t = toc;
         time = t;
         fprintf('m = %e (span tree), time = %f sec\n', m, t);
+        
+    case 'gmres'
+        % Construct R - 
+        DeltapC = diagblocks(R, W, 0);
+        DA = R;
+        for j = 1 : k
+            DA{j} = round(R{j} - DeltapC{j}, ttol);
+        end
+        
+        QQ = kronSum(R{:}, ttol) + Wsync;
+        Delta = diag(QQ * tt_ones(n));
+        
+        QQ = round(QQ - Delta, ttol);
+        
+        kk = prod(size(pi0));
+        b = round(tt_ones(n) - en, ttol);
+        %l = gmres(full(QQ), full(b), kk, ...
+        %        tol, kk, full(kronSum(DA{:}, ttol)));
+        %m = -dot(full(pi0), l);
+        
+        % Compute minimum and maximum eigenvalues of a Kronecker sum
+        [scl, cnd] = minmaxeig(DA);
+
+        if scl ~= 0
+            cnd = cnd / scl;
+        else
+            cnd = 0;
+            scl = 1;
+        end
+        
+        QQ = QQ / scl;
+        for j = 1 : length(DA)
+            DA{j} = -DA{j} / scl;
+        end
+        b = b / scl;
+        
+        % expinv = @(x) tt_tensor(reshape(full(-kronSum(DA{:}, ttol)) \ full(x), n));
+        expinv = @(x) -ttexpsummldivide(DA, x, 12, ttol);
+        
+        tic;
+        l = tt_gmres_block(...
+            @(x,ttol) { round(expinv(QQ*x{1}), ttol) }, ...
+            expinv(b), ttol, ...
+            'restart', 100, 'max_iters', 100, 'tol_exit', tol);
+        m = -dot(pi0, l{1});
+        t = toc;
+        
+        if debug
+            fprintf('m = %e (gmres), time = %f sec\n', m, t);
+        end
+        
+        time = t;
+        
         
     otherwise
         error('Unsupported method');
