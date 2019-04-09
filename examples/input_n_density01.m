@@ -37,7 +37,7 @@ disp(topology);
   if strcmp(method, 'ttexpsums2')
     [m, time] = computeMTTF(R, W, 1e-8, 1e-3, method, true);
   else
-    [m, time] = computeMTTF(R, W, 1e-6, 1e-3, method, true);
+    [m, time] = computeMTTF(R, W, 1e-8, 1e-3, method, true);
   end
 
 end
