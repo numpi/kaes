@@ -1,8 +1,10 @@
-function acc_times = test_examples(N)
+function acc_times = test_examples(N, sd)
 %TEST_EXAMPLES
 
+rng(sd);
+
 % Number of test to run
-k = 100;
+k = 1;
 
 acc_times = [];
 

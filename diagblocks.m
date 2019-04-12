@@ -1,7 +1,11 @@
-function D = diagblocks(R, W)
+function D = diagblocks(R, W, shift_param)
 %DIAGBLOCKS Compute diagonal matrices D{j} such that 
 %
 %   kronSum(R{:}) <= kronSum(D{:})   component-wise
+
+if ~exist('shift_param', 'var')
+    shift_param = 1;
+end
 
 k = length(R);
 n = arrayfun(@(i) size(R{i}, 1), 1 : k);
@@ -39,7 +43,7 @@ for i = 1 : size(W, 1)
 end
 
 for i = 1 : k
-    shift = 1 * nrm * tt_matrix(eye(size(D{i}))) / k;
+    shift = shift_param * nrm * tt_matrix(eye(size(D{i}))) / k;
     D{i} = D{i} + shift;
 end
 

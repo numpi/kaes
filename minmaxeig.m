@@ -15,8 +15,8 @@ u = 0.0;
 
 for j = 1 : length(A)
     s = eig(full(A{j}));
-    l = l + min(s);
-    u = u + max(s);
+    l = l + min(abs(s));
+    u = u + max(abs(s));
 end
 
 end
