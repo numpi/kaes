@@ -314,13 +314,17 @@ switch method
     case 'gmres'
         % Construct R - 
         DeltapC = diagblocks(R, W, 0);
+        DeltapC = cell(1, k);
+         for j = 1 : k
+             DeltapC{j} = tt_matrix( diag(full(R{j}) * ones(n(j), 1)) );
+         end
         DA = R;
         for j = 1 : k
             DA{j} = round(R{j} - DeltapC{j}, ttol);
         end
         
         QQ = kronSum(R{:}, ttol) + Wsync;
-        Delta = diag(QQ * tt_ones(n));
+        Delta = round(diag(QQ * tt_ones(n)), ttol);
         
         QQ = round(QQ - Delta, ttol);
         
@@ -347,13 +351,20 @@ switch method
         b = b / scl;
         
         % expinv = @(x) tt_tensor(reshape(full(-kronSum(DA{:}, ttol)) \ full(x), n));
-        expinv = @(x) -ttexpsummldivide(DA, x, 12, ttol);
+        expinv = @(x) -ttexpsummldivide(DA, x, 8, ttol);
+        %DeltapB = round(Delta - kronSum(DeltapC{:}, ttol), ttol);
+        %expinv = @(x) gmres_preconditioner(DA, DeltapB, x);
+        
+        % A good preconditioner ?
+        % M = round(kronSum(R{:}, ttol) - Delta, ttol) / scl;
+        % MM = round(M' * M, tol);
+        % expinv = @(x) amen_solve2(MM, M' * x, 1e-2);
         
         tic;
         l = tt_gmres_block(...
             @(x,ttol) { round(expinv(QQ*x{1}), ttol) }, ...
-            expinv(b), ttol, ...
-            'restart', 100, 'max_iters', 100, 'tol_exit', tol);
+            expinv(b), 1e-6, ...
+            'restart', 18, 'max_iters', 500, 'tol_exit', tol);
         m = -dot(pi0, l{1});
         t = toc;
         
@@ -363,11 +374,36 @@ switch method
         
         time = t;
         
+    case 'amen'
+        QQ = kronSum(R{:}, ttol) + Wsync;
+        Delta = round(diag(QQ * tt_ones(n)), ttol);
+        
+        QQ = round(QQ - Delta, ttol);
+        
+        kk = prod(size(pi0));
+        b = round(tt_ones(n) - en, ttol);
+        
+        QQ2 = round(QQ' * QQ, ttol);
+        toc;
+        l = amen_solve2(QQ2, QQ' * b, tol^2);
+        m = -dot(l, pi0);
+        t = toc;
+        
+        if debug
+            fprintf('m = %e (amen), time = %f sec\n', m, t);
+        end
+        
+        time = t;
         
     otherwise
         error('Unsupported method');
         
 end
+
+    function y = gmres_preconditioner(DA, DeltapB, x)
+        y = round(DeltapB * (-ttexpsummldivide(DA, x, expn, tol)), ttol);
+        y = -ttexpsummldivide(DA, x - y, expn, tol);
+    end
 
 end
 

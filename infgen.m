@@ -7,6 +7,9 @@ function [Q, M, Wsync, Rsys] = infgen(R, W, MM, tol, sp)
 % If sp is true the output is a sparse matrix, otherwise is given in TT
 % format. 
 
+% WARNING: The order of the Kronecker product should be fixed and made
+% coherent!
+
 if sp
     Rloc = sparse(full(R{1,1}));
 else
@@ -39,7 +42,7 @@ for i = 1 : size(W, 1)
         if isa(WsyncInside, 'tt_matrix')
             WsyncInside = tkron(WsyncInside, W{i,j});    
         else
-            WsyncInside = kron(sparse(full(W{i,j})), WsyncInside);
+            WsyncInside = kron(WsyncInside, sparse(full(W{i,j})));
         end
     end
     
