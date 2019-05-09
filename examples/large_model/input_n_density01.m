@@ -28,17 +28,26 @@ disp(topology);
 
   % Construct Rs and Ws
   [R, W] = largeModel(n, topology(pp,pp), lambda(pp), mu(pp), p(pp));
+  
+  % Select the absorbing state -- state 3 in all the subsystems
+  absorbing_states = 3 * ones(1, n);
+  
+  % Starting state of the system
+  pi0 = ktt_ej(3*ones(1,n), ones(1,n));
+  r   = round(ktt_ones(3*ones(1,n)) - ktt_ej(3*ones(1,n),3*ones(1,n)), 1e-8);
 
   % Compute the measure
   if n <= 9
-    m = computeMTTF(R, W, 1e-6, 1e-3, 'spantree');
+    % m = computeMTTF(R, W, 1e-6, 1e-3, 'spantree');
+	m = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
+					 'algorithm', 'spantree', ...
+					 'absorbing_states', absorbing_states);
   end
+  
+  [m, time] = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
+				     	   'algorithm', method, ...
+						   'absorbing_states', absorbing_states);
 
-  if strcmp(method, 'ttexpsums2')
-    [m, time] = computeMTTF(R, W, 1e-8, 1e-3, method, true);
-  else
-    [m, time] = computeMTTF(R, W, 1e-8, 1e-3, method, true);
-  end
 
 end
 

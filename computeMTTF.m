@@ -43,11 +43,11 @@ function [m, time] = computeMTTF(R, W, ttol, tol, method, debug)
 %
 %    DEBUG, if set to true, enables the debug output. 
 
-time = 0;
-
 if ~exist('debug', 'var')
     debug = false;
 end
+
+fmt = ktt_format(R{1});
 
 maxsteps = inf;
 
@@ -64,43 +64,28 @@ if ~exist('method', 'var')
 end
 
 DeltapC = diagblocks(R, W);
-Deltap = -kronSum(DeltapC{:}, ttol);
+Deltap = - round(ktt_kronsum(DeltapC{:}), ttol);
 
+Wsync = ktt_zeros(n, n, fmt);
 for i = 1 : size(W, 1)
-    WsyncInside = W{i,1};
-    for j = 2 : k
-        WsyncInside = tkron(WsyncInside, W{i,j});
-    end
-    
-    if i > 1
-        Wsync = Wsync + WsyncInside;
-    else
-        Wsync = WsyncInside;
-    end
-    
-    Wsync = round(Wsync, ttol);
+	Wsync = round(Wsync + ktt_kron(W{i,:}), ttol);
 end
 
-if exist('Wsync', 'var')
-    QQ = kronSum(R{:}, ttol) + Wsync;
-else
-    QQ = kronSum(R{:}, ttol);
-end
+QQ =round(ktt_kronsum(R{:}) + Wsync, ttol);
 
-Delta = -diag(QQ * tt_ones(n));
+Delta = -diag(QQ * ktt_ones(n, fmt));
 
-A1 = kronSum(R{:}, ttol);
-if exist('Wsync', 'var')
-    A2 = round(Wsync + (Delta - Deltap), ttol);
-else
-    A2 = round(Delta - Deltap, ttol);
-end
+A1 = round(ktt_kronsum(R{:}), ttol);
+A2 = round(Wsync + (Delta - Deltap), ttol);
 
 D = Deltap;
 
-pi0 = createpi0(n);
-en = createen(n);
-S = round(tt_matrix(kron(en, (A1 + A2) * en)), ttol);
+% Create the vector pi0 as a Kronecker product
+pi0 = ktt_ej(n, ones(k, 1), fmt);
+en  = ktt_ej(n, n, fmt);
+
+% S = round(tt_matrix(kron(en, (A1 + A2) * en)), ttol);
+S = round(ktt_outerprod(A1*en + A2*en, en), ttol);
 
 DA = R;
 for j = 1 : k
@@ -174,7 +159,7 @@ switch method
         for j = 1 : k
             DA{j} = (- DA{j} + DeltapC{j}) / scl;
         end
-        y0 = tt_ones(n,k) - en;
+        y0 = ktt_ones(n) - en;
         m = ttexpsummldivide(DA, y0, expn, ttol);
         y = m;
         nrmY = norm(y);
@@ -211,7 +196,7 @@ switch method
         for j = 1 : k
             DA{j} = (- DA{j} + DeltapC{j})' / scl;
         end
-        r = tt_ones(n,k) - en;
+        r = ktt_ones(n) - en;
         y0 = pi0;
         m = ttexpsummldivide(DA, y0, expn, ttol);
         y = m;
@@ -253,7 +238,7 @@ switch method
             DA{j} = (- DA{j} + DeltapC{j}) / scl;
         end
 
-        y = -ttexpsummldivide(DA, tt_ones(n), expn, ttol);
+        y = -ttexpsummldivide(DA, ktt_ones(n), expn, ttol);
         X = ttexpsummldivide(DA, (A2 - S), expn, ttol);
 
         maxrank = inf;
@@ -270,8 +255,7 @@ switch method
             X = round( X * X, ttol * nrmX0 / nrmX, maxrank );
 
             nrmX = norm(X);
-	   nrmX0 = max(nrmX, nrmX0);
-
+			nrmX0 = max(nrmX, nrmX0);
             
             m = -dot(y, pi0) / scl;
 
@@ -294,6 +278,18 @@ switch method
     case 'spantree'
         tic;
         [Q, ~, ~, ~] = infgen(R, W, cell(1,1), 1e-8, true);
+		SR = cell(1, k); SW = cell(size(W,1), k);
+		for i = 1 : k
+			SR{i} = sparse(full(R{i}));
+			for j = 1 : size(W, 1)
+				SW{j,i} = sparse(full(W{j,i}));
+			end
+		end
+		Q = ktt_kronsum(SR{:}); 
+		for i = 1 : size(SW, 1)
+			Q = Q + ktt_kron(SW{i,:});
+		end
+		d = Q * ktt_ones(n, 'sparse'); Q = Q - spdiags(d, 0, prod(n), prod(n));
         
         if numel(Q) > 5e13 && false
             error('Q is too large: n = %d', numel(Q));
