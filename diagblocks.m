@@ -3,27 +3,28 @@ function D = diagblocks(R, W, shift_param)
 %
 %   kronSum(R{:}) <= kronSum(D{:})   component-wise
 
-k = length(R);
-n = arrayfun(@(i) size(R{i}, 1), 1 : k);
-
-Q = ktt_kronsum(R{:}); 
-for i = 1 : size(W, 1)
-	Q = Q + ktt_kron(W{i,:});
-end
-d = Q * ktt_ones(n);
-
-D = cell(1, k);
-
-mm = tt_max(d);
-for j = 1 : k
-	D{j} = tt_matrix(mm/k * eye(n(j)));
-end
-return;
-
-
 if ~exist('shift_param', 'var')
-    shift_param = 1;
+    shift_param = 0;
 end
+
+% k = length(R);
+% n = arrayfun(@(i) size(R{i}, 1), 1 : k);
+% 
+% Q = ktt_kronsum(R{:}); 
+% for i = 1 : size(W, 1)
+% 	Q = Q + ktt_kron(W{i,:});
+% end
+% d = Q * ktt_ones(n);
+% 
+% D = cell(1, k);
+% 
+% mm = tt_max(d) * (1 + shift_param);
+% for j = 1 : k
+% 	D{j} = tt_matrix(mm/k * eye(n(j)));
+% end
+% return;
+
+
 
 k = length(R);
 n = arrayfun(@(i) size(R{i}, 1), 1 : k);
@@ -57,10 +58,9 @@ for i = 1 : size(W, 1)
     %    D{j} = D{j} + diag(W{i,j} * tt_ones(n(j), 1));
     %end
     % shift = 100 * max(norm(D{i}), norm(M)) * tt_matrix(eye(size(D{i}))) / size(W, 2);
-    % D{1} = round(D{1} + M, 1e-8);
+    D{1} = round(D{1} + M, 1e-8);
 end
 
-shift_param = 0.01;
 for i = 1 : k
     shift = shift_param * nrm * tt_matrix(eye(size(D{i}))) / k;
     D{i} = D{i} + shift;

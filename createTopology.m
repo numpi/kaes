@@ -55,7 +55,20 @@ case 'randperm'
         j = randi(n);
         T(i,j) = T(i,j) + 1;
       end
-    end
+	end
+	
+
+case 'rand'
+
+    T = eye(n, n);
+
+    for i = 1: n
+      if rand < p
+        % Create a second connection on this row
+        j = randi(n);
+        T(i,j) = T(i,j) + 1;
+      end
+    end	
 
 case 'cycle'
 

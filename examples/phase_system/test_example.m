@@ -8,13 +8,13 @@ tol  = 1e-3;
 rng('default');
 
 % Number of components
-n = 10;
+n = 12;
 
 % Number of phases in the system
 nphases = 3;
 
 % Topology of failure propagation between the components
-T = createTopology(n, 1/n, 'randperm');
+T = createTopology(n, 1/n, 'rand');
 
 % Topology and rates of the phases
 TP = [ 0 1 0 ; ...
@@ -38,15 +38,22 @@ end
 % as the first component. 
 R = { TP, R{:} };
 
-W = cell(1 + nphases * n, n + 1);
-for j = 1 : nphases
+nsyncs = 0;
+for j = 1 : length(WW)
+	nsyncs = nsyncs + size(WW{j}, 1);
+end
+
+W = cell(1 + nsyncs, n + 1);
+counter = 0;
+for j = 1 : length(WW)
 	S = zeros(nphases); S(j,j) = 1;
-	for i = 1 : n
-		W{i+(j-1)*n, 1} = S;
+	for i = 1 : size(WW{j}, 1)
+		W{i+counter, 1} = S;
 		for k = 1 : n
-			W{i+(j-1)*n, k+1} = WW{j}{i,k};
+			W{i+counter, k+1} = WW{j}{i,k};
 		end
 	end
+	counter = counter + size(WW{j}, 1);
 end
 
 W{end,1} = -TP;
@@ -84,10 +91,10 @@ m = eval_measure('inv', pi0, r, R, W, ...
 	'debug', debug, ...
 	'algorithm', 'ttexpsums2');
 
-m = eval_measure('inv', pi0, r, R, W, ...
-	'absorbing_states', absorbing_states, ...
-	'debug', debug, ...
-	'algorithm', 'ttexpsumst');
+% m = eval_measure('inv', pi0, r, R, W, ...
+% 	'absorbing_states', absorbing_states, ...
+% 	'debug', debug, ...
+% 	'algorithm', 'ttexpsumst');
 
 
 % end

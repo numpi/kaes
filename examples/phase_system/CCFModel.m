@@ -8,8 +8,11 @@ function [R, W, M] = CCFModel(n, topology, iso, cas, mu)
 %
 % Each failed component is repaired with rate MU(j). 
 
+% Count the rows of T where we need to have some synchronization
+v = ( topology - eye(n) ) * ones(n, 1); v = find(v ~= 0);
+
 R = cell(1, n);
-W = cell(n, n);
+W = cell(length(v), n);
 M = cell(1,n);
 
 for j = 1 : n
@@ -19,15 +22,15 @@ for j = 1 : n
     M{j} = [1 ; 0];
 end
 
-for i = 1 : n
+for i = 1 : length(v)
    for j = 1 : n
-      if ( topology(i,j) == 1 )
+      if ( topology(v(i),j) == 1 )
           W{i,j} = zeros(2,2);
-          W{i,j}(1,2) = cas(i);
+          W{i,j}(1,2) = cas(v(i));
 		  
 		  % This synchronization transition is enabled only if the
 		  % component J is not failed. 
-		  if i ~= j
+		  if v(i) ~= j
 			W{i,j}(2,2) = 1.0;
 		  end
       else
