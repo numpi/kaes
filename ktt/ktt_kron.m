@@ -3,7 +3,7 @@ function C = ktt_kron(varargin)
 
 k = length(varargin);
 
-if isa(varargin{1}, 'tt_matrix')
+if isa(varargin{1}, 'tt_matrix') || isa(varargin{1}, 'tt_tensor')
 	C = varargin{1};
 	for j = 2 : k
 		C = tkron(varargin{j}, C);

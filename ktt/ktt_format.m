@@ -1,7 +1,7 @@
 function F = ktt_format(A)
 %KTT_FORMAT 
 
-if isa(A, 'tt_matrix') || isa(A, 'tt_vector')
+if isa(A, 'tt_matrix') || isa(A, 'tt_tensor')
 	F = 'tt';
 	return;
 end
