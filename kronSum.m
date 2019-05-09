@@ -19,7 +19,7 @@ else
     end
 
     if isa(B, 'tt_matrix')
-        C = tkron(A,IB) + tkron(IA,B);
+        C = tkron(IB,A) + tkron(B,IA);
     else
         C = kron(A,IB) + kron(IA,B);
     end

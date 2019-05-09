@@ -1,6 +1,12 @@
 % function test_example(n)
 %TEST_EXAMPLE 
 
+debug = true;
+ttol = 1e-8;
+tol  = 1e-4;
+
+rng('default');
+
 % Number of components
 n = 2;
 
@@ -32,7 +38,7 @@ end
 % as the first component. 
 R = { TP, R{:} };
 
-W = cell(nphases * n, n + 1);
+W = cell(1 + nphases * n, n + 1);
 for j = 1 : nphases
 	S = zeros(nphases); S(j,j) = 1;
 	for i = 1 : n
@@ -43,8 +49,32 @@ for j = 1 : nphases
 	end
 end
 
+W{end,1} = -TP;
+for j = 1 : n
+	W{end,j+1} = [ 0 0 ; ...
+		           0 1 ];
+end
+
 Q = infgen(R, W, M, 1e-8, false);
 
+l = [1:3,5:7,9:11];
+Qh = Q(l,l); 
+w = - Qh \ ones(9,1);
+fprintf('MTTF = %e\n', w(1));
+
+% Convert everything to TT format
+for i = 1 : length(R)
+	R{i} = tt_matrix(R{i});
+	for j = 1 : size(W, 1)
+		W{j,i} = tt_matrix(W{j,i});
+	end
+end
+
+Q = infgen(R, W, M, 1e-8, false);
+
+absorbing_states = [ 1 : nphases ; 2 * ones(n, nphases) ];
+
+m = invQh_reward(R, W, createpi0(2, n), tt_ones(2, n), absorbing_states, ttol, tol, debug);
 
 
 % end

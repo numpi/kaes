@@ -39,7 +39,7 @@ for i = 1 : size(W, 1)
     %    D{j} = D{j} + diag(W{i,j} * tt_ones(n(j), 1));
     %end
     % shift = 100 * max(norm(D{i}), norm(M)) * tt_matrix(eye(size(D{i}))) / size(W, 2);
-    D{i} = round(D{i} + M, 1e-8);
+    D{1} = round(D{1} + M, 1e-8);
 end
 
 for i = 1 : k

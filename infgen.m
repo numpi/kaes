@@ -40,7 +40,7 @@ for i = 1 : size(W, 1)
     
     for j = 2 : n
         if isa(WsyncInside, 'tt_matrix')
-            WsyncInside = tkron(WsyncInside, W{i,j});    
+            WsyncInside = tkron(W{i,j}, WsyncInside);
         else
             WsyncInside = kron(WsyncInside, sparse(full(W{i,j})));
         end
@@ -76,7 +76,7 @@ if ~exist('Wsync', 'var')
 end
 
 if isa(Q, 'tt_matrix')
-    e = tt_ones(k);
+    e = tt_ones(k(end:-1:1));
     s = Q * e;
     Q = Q - diag(s);
     Rsys = Rloc - diag(s);
