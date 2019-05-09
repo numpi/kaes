@@ -109,7 +109,7 @@ switch algorithm
                 dot(m, r) / scl, err, dot(m, r) * (1 + err) / scl);
             end
 
-            if rho < 1 && rho <= oldrho * (1 + 1e-8) && err < tol
+            if rho < 1 && rho <= oldrho * (1 + 1e-2) && err < tol
                 break
             end
             

@@ -3,6 +3,24 @@ function D = diagblocks(R, W, shift_param)
 %
 %   kronSum(R{:}) <= kronSum(D{:})   component-wise
 
+k = length(R);
+n = arrayfun(@(i) size(R{i}, 1), 1 : k);
+
+Q = ktt_kronsum(R{:}); 
+for i = 1 : size(W, 1)
+	Q = Q + ktt_kron(W{i,:});
+end
+d = Q * ktt_ones(n);
+
+D = cell(1, k);
+
+mm = tt_max(d);
+for j = 1 : k
+	D{j} = tt_matrix(mm/k * eye(n(j)));
+end
+return;
+
+
 if ~exist('shift_param', 'var')
     shift_param = 1;
 end
