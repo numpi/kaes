@@ -8,7 +8,10 @@ end
 k = length(n);
 v = cell(1, k);
 
-if any(k > n) || any(k <= 0)
+j = j(:);
+n = n(:);
+
+if any(j > n) || any(j <= 0)
 	error('Indices out of bounds');
 end
 

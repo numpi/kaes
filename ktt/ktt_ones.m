@@ -24,10 +24,10 @@ switch fmt
 	case 'sparse'
 		m = varargin{1};
 		if ninputs == 1
-			Z = spones(prod(m), 1);
+			Z = sparse(ones(prod(m), 1));
 		else
 			n = varargin{2};
-			Z = spones(prod(m), prod(n));
+			Z = sparse(ones(prod(m), prod(n)));
 		end
 	otherwise
 		error('Unsupported format');
