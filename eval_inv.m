@@ -79,6 +79,46 @@ end
 
 
 switch algorithm
+	
+	 case 'ttexpsumst'
+        % MTTD Q expsums tt
+        timer = tic;
+        DA = R;
+        for j = 1 : k
+            DA{j} = (- DA{j} + DeltapC{j})' / scl;
+        end
+        % r = ktt_ones(n) - en;
+        y0 = pi0;
+        m = ttexpsummldivide(DA, y0, expn, ttol);
+        y = m;
+        nrmY = norm(y);
+        j = 1;
+        rho = 1;
+        while j < maxsteps
+            y = ttexpsummldivide(DA, (A2 - S)' * y, expn, ttol);
+            m = round(m + y, ttol);
+            oldnrmY = nrmY;
+            nrmY = norm(y); nrmM = norm(m);
+            oldrho = rho;
+            rho = nrmY / oldnrmY;    
+            err = nrmY / (1 - rho) / norm(m);
+            if debug
+            fprintf('Step %d, Neumann residue ~ %e, norm(m) = %e, erank = %f, erank y = %f, spectral radius ~ %e\n', ...
+                j, nrmY, nrmM, erank(m), erank(y), rho);
+            fprintf('Measure estimate: %e (err. estimate = %e, est. upper bound = %e)\n', ...
+                dot(m, r) / scl, err, dot(m, r) * (1 + err) / scl);
+            end
+
+            if rho < 1 && rho <= oldrho * (1 + 1e-8) && err < tol
+                break
+            end
+            
+            j = j + 1;
+        end
+        m = m / scl;
+        t = toc(timer);
+        time = t;
+        fprintf('m = %e (exp sums tt), time = %f sec\n', dot(r, m), t);        
         
     case 'ttexpsums2'
         % MTTD Q expsums tt

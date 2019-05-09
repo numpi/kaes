@@ -19,7 +19,8 @@ switch fmt
 		if ninputs == 1
 			Z = tt_ones(varargin{1}(end:-1:1));
 		else
-			Z = tt_matrix(tt_ones(varargin{1}(end:-1:1) .* varargin{2}(end:-1:1)), varargin{1}, varargin{2});
+			Z = tt_matrix(tt_ones(varargin{1}(end:-1:1) .* varargin{2}(end:-1:1)), ...
+				varargin{1}(end:-1:1), varargin{2}(end:-1:1));
 		end
 	case 'sparse'
 		m = varargin{1};

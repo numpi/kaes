@@ -3,12 +3,12 @@
 
 debug = true;
 ttol = 1e-8;
-tol  = 1e-4;
+tol  = 1e-3;
 
 rng('default');
 
 % Number of components
-n = 2;
+n = 10;
 
 % Number of phases in the system
 nphases = 3;
@@ -55,13 +55,6 @@ for j = 1 : n
 		           0 1 ];
 end
 
-Q = infgen(R, W, M, 1e-8, false);
-
-l = [1:3,5:7,9:11];
-Qh = Q(l,l); 
-w = - Qh \ ones(9,1);
-fprintf('MTTF = %e\n', w(1));
-
 % Convert everything to TT format
 for i = 1 : length(R)
 	R{i} = tt_matrix(R{i});
@@ -70,11 +63,31 @@ for i = 1 : length(R)
 	end
 end
 
-Q = infgen(R, W, M, 1e-8, false);
+% Q = infgen(R, W, M, 1e-8, false);
 
-absorbing_states = [ 1 : nphases ; 2 * ones(n, nphases) ];
+absorbing_states = [ 1 : nphases ; 2 * ones(n, nphases) ]';
 
-m = invQh_reward(R, W, createpi0(2, n), tt_ones(2, n), absorbing_states, ttol, tol, debug);
+sz = [ nphases, ones(1,n) * 2 ];
+pi0 = ktt_ej(sz, ones(1,n+1));
+
+% We do not need to put to zeros the rewards on absorbing states, these are
+% automatically ignored by eval_measure('inv', ...). 
+r   = ktt_ones(sz);
+
+m = eval_measure('inv', pi0, r, R, W, ...
+	'absorbing_states', absorbing_states, ...
+	'debug', debug, ...
+	'algorithm', 'spantree');
+
+m = eval_measure('inv', pi0, r, R, W, ...
+	'absorbing_states', absorbing_states, ...
+	'debug', debug, ...
+	'algorithm', 'ttexpsums2');
+
+m = eval_measure('inv', pi0, r, R, W, ...
+	'absorbing_states', absorbing_states, ...
+	'debug', debug, ...
+	'algorithm', 'ttexpsumst');
 
 
 % end
