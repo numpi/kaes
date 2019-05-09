@@ -8,10 +8,10 @@ tol  = 1e-3;
 rng('default');
 
 % Number of components
-n = 2;
+n = 15;
 
 % Topology of failure propagation between the components
-T = createTopology(n, 1, 'rand');
+T = createTopology(n, .5, 'rand');
 
 % We assume that the local transitions are phase independent
 iso = rand(1, n);
@@ -33,21 +33,23 @@ end
 absorbing_states = [ (red+2) * ones(1,n) ; (red+1) * ones(1,n) ];
 
 sz = [ ones(1,n) * (red+2) ];
-pi0 = ktt_ej(sz, ones(1,n+1));
+pi0 = ktt_ej(sz, ones(1,n));
 
 % We do not need to put to zeros the rewards on absorbing states, these are
 % automatically ignored by eval_measure('inv', ...). 
 r   = ktt_ones(sz);
 
-% m = eval_measure('inv', pi0, r, R, W, ...
-% 	'absorbing_states', absorbing_states, ...
-% 	'debug', debug, ...
-% 	'algorithm', 'spantree');
+if (red+2)^n < 1e5
+	m = eval_measure('inv', pi0, r, R, W, ...
+		'absorbing_states', absorbing_states, ...
+		'debug', debug, ...
+		'algorithm', 'spantree');
+end
 
 m = eval_measure('inv', pi0, r, R, W, ...
 	'absorbing_states', absorbing_states, ...
 	'debug', debug, ...
-	'algorithm', 'spantree');
+	'algorithm', 'ttexpsumst', 'ttol', 1e-5);
 
 
 % end

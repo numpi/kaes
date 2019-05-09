@@ -4,7 +4,7 @@ function D = diagblocks(R, W, shift_param)
 %   kronSum(R{:}) <= kronSum(D{:})   component-wise
 
 if ~exist('shift_param', 'var')
-    shift_param = 5;
+    shift_param = 0;
 end
 
 % k = length(R);

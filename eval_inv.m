@@ -101,12 +101,12 @@ switch algorithm
             nrmY = norm(y); nrmM = norm(m);
             oldrho = rho;
             rho = nrmY / oldnrmY;    
-            err = nrmY / (1 - rho) / norm(m);
-            if debug
-            fprintf('Step %d, Neumann residue ~ %e, norm(m) = %e, erank = %f, erank y = %f, spectral radius ~ %e\n', ...
-                j, nrmY, nrmM, erank(m), erank(y), rho);
-            fprintf('Measure estimate: %e (err. estimate = %e, est. upper bound = %e)\n', ...
-                dot(m, r) / scl, err, dot(m, r) * (1 + err) / scl);
+            err = nrmY / (1 - rho) / nrmM;
+            if debug && mod(j, 50) == 0
+				fprintf('Step %d, Neumann residue ~ %e, norm(m) = %e, erank = %f, erank y = %f, spectral radius ~ %e\n', ...
+					j, nrmY, nrmM, erank(m), erank(y), rho);
+				fprintf('Measure estimate: %e (err. estimate = %e, est. upper bound = %e)\n', ...
+					dot(m, r) / scl, err, dot(m, r) * (1 + err) / scl);
             end
 
             if rho < 1 && rho <= oldrho * (1 + 1e-2) && err < tol
