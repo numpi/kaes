@@ -1,5 +1,5 @@
-function [m, time] = eval_inv(pi0, r, R, W, absorbing_states, ...
-							  algorithm, debug, tol, ttol)
+function [m, time, y] = eval_inv(pi0, r, R, W, absorbing_states, ...
+							  algorithm, debug, tol, ttol, shift)
 %EVAL_INV 
 
 k = length(R);
@@ -22,7 +22,7 @@ maxsteps = inf;
 % minmaxeig -- but this approach could be refined.
 expn  = 4;
 
-DeltapC = diagblocks(R, W, 0);
+DeltapC = diagblocks(R, W, shift);
 Deltap = - round(ktt_kronsum(DeltapC{:}), ttol);
 
 Wsync = ktt_zeros(n, n, fmt);
@@ -114,7 +114,8 @@ switch algorithm
             end
             
             j = j + 1;
-        end
+		end
+		y = y / scl;
         m = m / scl;
         t = toc(timer);
         time = t;
@@ -157,10 +158,10 @@ switch algorithm
             end
             
             j = j + 1;
-        end
+		end
 
+		y = y / scl;
         m = - dot(y, pi0);
-        m = m / scl;
         t = toc(timer);
         fprintf('m = %e (exp sums tt), time = %f sec\n', m, t);
         time = t;
@@ -205,7 +206,11 @@ switch algorithm
 		end
 		
 		idx = setdiff(idx, abs_idx);
-		m = -Q(idx,idx) \ fr(idx); m = dot(m, fpi0(idx));
+		y = Q(idx,idx) \ fr(idx); m = -dot(y, fpi0(idx));
+		
+		% Convert to tt_tensor for compatibility
+		yy = zeros(length(fr), 1); yy(idx) = y;
+		y = tt_tensor(yy, size(r));
 		
         t = toc(tspantree);
         time = t;
