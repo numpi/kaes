@@ -26,9 +26,21 @@ switch fun
 	case 'inv2'
 		[~, time1, y] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift);
-		[m, time2] = eval_inv(pi0, y, R, W, absorbing_states, ...
+		[m, time2] = eval_inv(pi0, -y, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift);
 		time = time1 + time2;
+	
+	case 'cond_etta'
+		% Conditional expected time to absorption: we select as
+		% absorbing_state to condition the first in the matrix
+		% absorbing_states
+		[m, time] = eval_cond_etta(pi0, R, W, absorbing_states, ...
+								   algorithm, debug, tol, ttol, shift);
+							   
+		if debug
+			fprintf('EVAL_MEASURE :: cond_etta :: measure = %e\n', m);
+			fprintf('EVAL_MEASURE :: cond_etta :: time    = %f\n', time);
+		end
 		
 	otherwise
 		error('Unsupported measure');
