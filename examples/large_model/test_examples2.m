@@ -4,7 +4,7 @@ function acc_times = test_examples2(N, sd)
 rng(sd);
 
 % Number of test to run
-k = 10;
+k = 1;
 
 acc_times = [];
 
