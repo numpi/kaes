@@ -57,8 +57,7 @@ for i = 1 : n
             if i == j % flag == 0
                 W{i,j}(1,3) = lambda(i)*(1-p(i));
             else
-                W{i,j}(1:3,3) = 1;
-                
+                W{i,j}(1:3,3) = 1;                
             end
         else
             % if component i is subject to NO exterior attack

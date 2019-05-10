@@ -8,10 +8,10 @@ tol  = 1e-3;
 rng('default');
 
 % Number of components
-n = 15;
+n = 5;
 
 % Topology of failure propagation between the components
-T = createTopology(n, .5, 'rand');
+T = createTopology(n, .5, 'starnoloops');
 
 % We assume that the local transitions are phase independent
 iso = rand(1, n);
@@ -49,7 +49,7 @@ end
 m = eval_measure('inv', pi0, r, R, W, ...
 	'absorbing_states', absorbing_states, ...
 	'debug', debug, ...
-	'algorithm', 'ttexpsumst', 'ttol', 1e-5);
+	'algorithm', 'ttexpsums2', 'ttol', 1e-8);
 
 
 % end

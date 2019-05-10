@@ -22,7 +22,7 @@ maxsteps = inf;
 % minmaxeig -- but this approach could be refined.
 expn  = 4;
 
-DeltapC = diagblocks(R, W);
+DeltapC = diagblocks(R, W, 0);
 Deltap = - round(ktt_kronsum(DeltapC{:}), ttol);
 
 Wsync = ktt_zeros(n, n, fmt);
@@ -32,7 +32,7 @@ end
 
 QQ =round(ktt_kronsum(R{:}) + Wsync, ttol);
 
-Delta = -diag(QQ * ktt_ones(n, fmt));
+Delta = -round(diag(QQ * ktt_ones(n, fmt)), ttol);
 
 A1 = round(ktt_kronsum(R{:}), ttol);
 A2 = round(Wsync + (Delta - Deltap), ttol);
@@ -70,13 +70,13 @@ if debug
 	fprintf('> dimension = %d, cond = %e \n', prod(n), cnd);
 end
 
-if cnd < 2
+if cnd < 3
     expn = 4;
 elseif cnd < 4
-    expn = 8;
+    expn = 6;
+else
+	expn = 8;
 end
-
-
 
 switch algorithm
 	
@@ -142,7 +142,7 @@ switch algorithm
             
             z = round( X * y, ttol, maxrank );
             y = round( y + z, ttol, maxrank ); clear('z');
-            X = round( X * X, ttol * nrmX0 / nrmX, maxrank );
+            X = round( X * X, min(1e-2, ttol * nrmX0 / nrmX), maxrank );
 
             nrmX = norm(X);
 			nrmX0 = max(nrmX, nrmX0);
@@ -152,7 +152,7 @@ switch algorithm
             fprintf('Step %d, Residue ~ %e, erank = %f %f, m = %f\n', ...
                 j, nrmX, erank(X), erank(y), -dot(y, pi0) / scl);
 
-            if nrmX < 1e-8 || (m - oldm) < m * tol
+            if nrmX < sqrt(tol) || (m - oldm) < m * tol
                 break;
             end
             
@@ -210,6 +210,70 @@ switch algorithm
         t = toc(tspantree);
         time = t;
         fprintf('m = %e (span tree), time = %f sec\n', m, t);
+		
+    case 'gmres'
+        % Construct R - 
+        DeltapC = diagblocks(R, W, 0);
+        %DeltapC = cell(1, k);
+        % for j = 1 : k
+        %     DeltapC{j} = tt_matrix( diag(full(R{j}) * ones(n(j), 1)) );
+        % end
+        DA = R;
+        for j = 1 : k
+            DA{j} = round(R{j} - DeltapC{j}, ttol);
+        end
+        
+        QQ = round(ktt_kronsum(R{:}) + Wsync, ttol);
+        Delta = round(diag(QQ * ktt_ones(n)), ttol);
+        
+        QQ = round(QQ - Delta, ttol);
+        
+        b = r;
+		kk = prod(n);
+        l = gmres(full(QQ), full(b), kk, ...
+                tol, kk, full(kronSum(DA{:}, ttol)));
+        m = -dot(full(pi0), l);
+		% keyboard
+        
+        % Compute minimum and maximum eigenvalues of a Kronecker sum
+        [scl, cnd] = minmaxeig(DA);
+
+        if scl ~= 0
+            cnd = cnd / scl;
+        else
+            cnd = 0;
+            scl = 1;
+        end
+        
+        QQ = QQ / scl;
+        for j = 1 : length(DA)
+            DA{j} = -DA{j} / scl;
+        end
+        b = b / scl;
+        
+        % expinv = @(x) tt_tensor(reshape(full(-kronSum(DA{:}, ttol)) \ full(x), n));
+        expinv = @(x) -ttexpsummldivide(DA, x, 8, ttol);
+        %DeltapB = round(Delta - kronSum(DeltapC{:}, ttol), ttol);
+        %expinv = @(x) gmres_preconditioner(DA, DeltapB, x);
+        
+        % A good preconditioner ?
+        % M = round(kronSum(R{:}, ttol) - Delta, ttol) / scl;
+        % MM = round(M' * M, tol);
+        % expinv = @(x) amen_solve2(MM, M' * x, 1e-2);
+        
+        timer = tic;
+        l = tt_gmres_block(...
+            @(x,ttol) { round(expinv(QQ*x{1}), ttol) }, ...
+            expinv(b), 1e-6, ...
+            'restart', 1800, 'max_iters', 500, 'tol_exit', tol);
+        m = -dot(pi0, l{1});
+        t = toc(timer);
+        
+        if debug
+            fprintf('m = %e (gmres), time = %f sec\n', m, t);
+        end
+        
+        time = t;		
 		
 	otherwise
 		error('Unsupported algorithm');
