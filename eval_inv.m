@@ -1,5 +1,5 @@
 function [m, time, y] = eval_inv(pi0, r, R, W, absorbing_states, ...
-							  algorithm, debug, tol, ttol, shift)
+							  algorithm, debug, tol, ttol, shift, fast_mult)
 %EVAL_INV 
 
 k = length(R);
@@ -143,15 +143,20 @@ switch algorithm
             
             z = round( X * y, ttol, maxrank );
             y = round( y + z, ttol, maxrank ); clear('z');
-            X = round( X * X, min(1e-2, ttol * nrmX0 / nrmX), maxrank );
+			
+			if fast_mult
+				X = ktt_iterative_mult(X, min(1e-2, ttol * nrmX0 / nrmX), debug);
+			else
+			    X = round( X * X, min(1e-2, ttol * nrmX0 / nrmX), maxrank );
+			end
 
             nrmX = norm(X);
 			nrmX0 = max(nrmX, nrmX0);
             
             m = -dot(y, pi0) / scl;
 
-            fprintf('Step %d, Residue ~ %e, erank = %f %f, m = %f\n', ...
-                j, nrmX, erank(X), erank(y), -dot(y, pi0) / scl);
+            fprintf('Step %d, Residue ~ %e, rank = %d %d, m = %f\n', ...
+                j, nrmX, max(rank(X)), max(rank(y)), -dot(y, pi0) / scl);
 
             if nrmX < sqrt(tol) || (m - oldm) < m * tol
                 break;

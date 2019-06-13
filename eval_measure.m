@@ -9,6 +9,7 @@ addOptional(p, 'debug', true);
 addOptional(p, 'tol', 1e-4);
 addOptional(p, 'ttol', 1e-8);
 addOptional(p, 'shift', 0);
+addOptional(p, 'iterative_mult', false);
 
 parse(p, varargin{:});
 
@@ -18,16 +19,17 @@ debug = p.Results.debug;
 tol = p.Results.tol;
 ttol = p.Results.ttol;
 shift = p.Results.shift;
+iterative_mult = p.Results.iterative_mult;
 
 switch fun
 	case 'inv'
 		[m, time] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
-							 algorithm, debug, tol, ttol, shift);
+							 algorithm, debug, tol, ttol, shift, iterative_mult);
 	case 'inv2'
 		[~, time1, y] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
-							 algorithm, debug, tol, ttol, shift);
+							 algorithm, debug, tol, ttol, shift, iterative_mult);
 		[m, time2] = eval_inv(pi0, -y, R, W, absorbing_states, ...
-							 algorithm, debug, tol, ttol, shift);
+							 algorithm, debug, tol, ttol, shift, iterative_mult);
 		time = time1 + time2;
 	
 	case 'cond_etta'
@@ -35,7 +37,8 @@ switch fun
 		% absorbing_state to condition the first in the matrix
 		% absorbing_states
 		[m, time] = eval_cond_etta(pi0, R, W, absorbing_states, ...
-								   algorithm, debug, tol, ttol, shift);
+								   algorithm, debug, tol, ttol, shift, ...
+								   iterative_mult);
 							   
 		if debug
 			fprintf('EVAL_MEASURE :: cond_etta :: measure = %e\n', m);

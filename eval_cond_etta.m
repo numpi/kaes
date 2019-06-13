@@ -1,5 +1,5 @@
 function [m, time] = eval_cond_etta(pi0, R, W, absorbing_states, ...
-				algorithm, debug, tol, ttol, shift)
+				algorithm, debug, tol, ttol, shift, iterative_mult)
 			
 k = length(R);
 n = arrayfun(@(i) size(R{i}, 1), 1 : k);
@@ -12,9 +12,9 @@ a = Q * ktt_ej(n, absorbing_states(1, :));
 
 % Compute the inverse function Qh \ a
 [m1, time1, v] = eval_inv(pi0, a, R, W, absorbing_states, algorithm, debug, ...
-						 tol, ttol, shift);
+						 tol, ttol, shift, iterative_mult);
 [m2, time2, ~] = eval_inv(pi0, -v, R, W, absorbing_states, algorithm, debug, ...
-						 tol, ttol, shift);
+						 tol, ttol, shift, iterative_mult);
 
 m = m2 / m1;
 
