@@ -1,14 +1,14 @@
 function M = ktt_iterative_mult(X, ttol, debug)
 %KTT_ITERATIVE_MULT Iteratively approximate X * X
-% 
-% The method decomposes X = X0 + dX, and approximates X*X by 
-%  
-%  X * X = X0*X0 + X0*dX + dX*X0 + KTT_ITERATIVE_MULT(dX, dX, ...), 
-% 
-% where the recursive call is done with a larger threshold induced by the
-% fact that dX is (hopefully) smaller than X. 
 %
-% EXPERIMENTAL CODE! Might not converge. 
+% The method decomposes X = X0 + dX, and approximates X*X by
+%
+%  X * X = X0*X0 + X0*dX + dX*X0 + KTT_ITERATIVE_MULT(dX, dX, ...),
+%
+% where the recursive call is done with a larger threshold induced by the
+% fact that dX is (hopefully) smaller than X.
+%
+% EXPERIMENTAL CODE! Might not converge.
 
 if ~exist('debug', 'var')
 	debug = false;
@@ -32,8 +32,8 @@ maxrank = max(10, ceil(sqrt(length(size(X)))));
 for j = 1 : maxit
 	nrmdX = norm(dX);
 	
-	% Adjust the relative tolerance
-	rtol = ttol * (nrmX / nrmdX)^2;
+	% Adjust the relative tolerance --we never allow to go below 1e-1
+	rtol = min(1e-1, ttol * (nrmX / nrmdX)^2);
 	
 	if debug
 		fprintf('KTT_ITERATIVE_MULT :: rank(dX) = %d, rank(M) = %d, res = %e\n', ...
