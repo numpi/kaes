@@ -32,8 +32,14 @@ if n <= 10
 				 'absorbing_states', absorbing_states);
 end
 
+shift = 0;
+
+if strcmp(method, 'ttexpsums2')
+	shift = 1e6;
+end
+
 [m, time] = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
-					   'algorithm', method, 'shift', 1e6, ...
+					   'algorithm', method, 'shift', shift, ...
 					   'absorbing_states', absorbing_states, ...
 					   'ttol', 1e-10, 'tol', 1e-3, 'iterative_mult', it_mult);
 				   
