@@ -1,9 +1,13 @@
-function time = input_n_density01(n, method, topology)
+function time = input_n_density01(n, method, topology, it_mult)
 %
 % Constructs the example decribed in the paper "Stochastic modeling and 
 %   evaluation of large interdependent composed models through Kronecker 
 %   algebra and Exponential sums", by G. Masetti, L. Robol, S. Chiaradonna,
 %   F. Di Giandomenico, submitted.
+
+if ~exist('it_mult', 'var')
+	it_mult = false;
+end
 
 %  topology = full((eye(n,n)+sprand(n,n, 1 / n)) > 0)
 if ~exist('topology', 'var')
@@ -46,7 +50,8 @@ disp(topology);
   
   [m, time] = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
 				     	   'algorithm', method, ...
-						   'absorbing_states', absorbing_states, 'ttol', 1e-7, 'iterative_mult', true);
+						   'absorbing_states', absorbing_states, ...
+						   'ttol', 1e-7, 'iterative_mult', it_mult);
 
 
 end
