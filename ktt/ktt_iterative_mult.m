@@ -19,21 +19,40 @@ nrmX = norm(X);
 X0 = round(X, ttol, ceil(sqrt(length(size(X)))));
 dX = round(X - X0, ttol);
 
-nrmdX = norm(dX);
-
 M = round(X0 * X0, ttol);
 M = round(M + dX * X0, ttol);
 M = round(M + X0 * dX, ttol);
 
-if debug
-	fprintf('KTT_ITERATIVE_MULT :: rank(dX) = %d, rank(M) = %d, tol = %e\n', ...
-		max(rank(dX)), max(rank(M)), ttol * (nrmX / nrmdX)^2);
-end
+X = dX;
 
-if nrmdX^2 > nrmX^2 * ttol
-	M = round(M + ktt_iterative_mult(dX, ttol * (nrmX / nrmdX)^2, debug), ttol);
-end
+maxit = 10000;
 
+maxrank = max(10, ceil(sqrt(length(size(X)))));
+
+for j = 1 : maxit
+	nrmdX = norm(dX);
+	
+	% Adjust the relative tolerance
+	rtol = ttol * (nrmX / nrmdX)^2;
+	
+	if debug
+		fprintf('KTT_ITERATIVE_MULT :: rank(dX) = %d, rank(M) = %d, res = %e\n', ...
+			max(rank(dX)), max(rank(M)), nrmdX^2 / nrmX^2);
+	end	
+	
+	if nrmdX^2 < nrmX^2 * ttol
+		break;
+	end
+	
+	X0 = round(X, rtol, maxrank);
+	dX = round(X - X0, rtol);
+
+	M = round(M + X0 * X0, rtol);
+	M = round(M + dX * X0, rtol);
+	M = round(M + X0 * dX, rtol);	
+	
+	X = dX;
+end
 
 end
 

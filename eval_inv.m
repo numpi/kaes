@@ -1,5 +1,5 @@
 function [m, time, y] = eval_inv(pi0, r, R, W, absorbing_states, ...
-							  algorithm, debug, tol, ttol, shift, fast_mult)
+							  algorithm, debug, tol, ttol, shift, iterative_mult)
 %EVAL_INV 
 
 k = length(R);
@@ -143,8 +143,8 @@ switch algorithm
             
             z = round( X * y, ttol, maxrank );
             y = round( y + z, ttol, maxrank ); clear('z');
-			
-			if fast_mult
+						
+			if iterative_mult
 				X = ktt_iterative_mult(X, min(1e-2, ttol * nrmX0 / nrmX), debug);
 			else
 			    X = round( X * X, min(1e-2, ttol * nrmX0 / nrmX), maxrank );

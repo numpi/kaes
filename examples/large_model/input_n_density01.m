@@ -46,7 +46,7 @@ disp(topology);
   
   [m, time] = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
 				     	   'algorithm', method, ...
-						   'absorbing_states', absorbing_states, 'ttol', 1e-7);
+						   'absorbing_states', absorbing_states, 'ttol', 1e-7, 'iterative_mult', true);
 
 
 end
