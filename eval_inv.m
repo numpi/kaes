@@ -145,7 +145,7 @@ switch algorithm
             y = round( y + z, ttol, maxrank ); clear('z');
 						
 			if iterative_mult
-				X = ktt_iterative_mult(X, min(1e-2, ttol * nrmX0 / nrmX), debug);
+				X = ktt_iterative_mult(X, ttol, debug);
 			else
 			    X = round( X * X, min(1e-2, ttol * nrmX0 / nrmX), maxrank );
 			end
