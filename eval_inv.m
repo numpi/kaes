@@ -97,11 +97,9 @@ switch algorithm
 			error('AMEN did not converge within the prescribed number of sweeps');
 		end
 		
-		if debug
-			fprintf('AMEN: Measure: %f\n', m);
-		end
-		
 		time = toc(timer);
+		
+		fprintf('m = %e (AMEn), time = %f sec\n', m, time);
 		
 	case 'dmrg'
 		timer = tic;
@@ -121,11 +119,8 @@ switch algorithm
 		
 		m = -dot(pi0, xx);
 		
-		if debug
-			fprintf('DMRG: Measure: %f\n', m);
-		end
-		
-		time = toc(timer);		
+		time = toc(timer);
+		fprintf('m = %e (dmrg), time = %f sec\n', m, time);        
 	
 	 case 'ttexpsumst'
         % MTTD Q expsums tt

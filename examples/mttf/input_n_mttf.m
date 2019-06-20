@@ -30,7 +30,6 @@ if n <= 10
 	m = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
 				 'algorithm', 'spantree', ...
 				 'absorbing_states', absorbing_states);
-			 pause
 end
 
 shift = 0;
