@@ -10,6 +10,7 @@ addOptional(p, 'tol', 1e-4);
 addOptional(p, 'ttol', 1e-8);
 addOptional(p, 'shift', 0);
 addOptional(p, 'iterative_mult', false);
+addOptional(p, 'use_sinc', false);
 
 parse(p, varargin{:});
 
@@ -20,16 +21,20 @@ tol = p.Results.tol;
 ttol = p.Results.ttol;
 shift = p.Results.shift;
 iterative_mult = p.Results.iterative_mult;
+use_sinc = p.Results.use_sinc;
 
 switch fun
 	case 'inv'
 		[m, time] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
-							 algorithm, debug, tol, ttol, shift, iterative_mult);
+							 algorithm, debug, tol, ttol, shift, ...
+							 iterative_mult, use_sinc);
 	case 'inv2'
 		[~, time1, y] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
-							 algorithm, debug, tol, ttol, shift, iterative_mult);
+							 algorithm, debug, tol, ttol, shift, ...
+							 iterative_mult, use_sinc);
 		[m, time2] = eval_inv(pi0, -y, R, W, absorbing_states, ...
-							 algorithm, debug, tol, ttol, shift, iterative_mult);
+							 algorithm, debug, tol, ttol, shift, ...
+							 iterative_mult, use_sinc);
 		time = time1 + time2;
 	
 	case 'cond_etta'
@@ -38,7 +43,7 @@ switch fun
 		% absorbing_states
 		[m, time] = eval_cond_etta(pi0, R, W, absorbing_states, ...
 								   algorithm, debug, tol, ttol, shift, ...
-								   iterative_mult);
+								   iterative_mult, use_sinc);
 							   
 		if debug
 			fprintf('EVAL_MEASURE :: cond_etta :: measure = %e\n', m);

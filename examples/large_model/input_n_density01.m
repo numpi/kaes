@@ -41,11 +41,12 @@ disp(topology);
   r   = round(ktt_ones(3*ones(1,n)) - ktt_ej(3*ones(1,n),3*ones(1,n)), 1e-8);
 
   % Compute the measure
-  if n <= 9
+  if n <= 10
     % m = computeMTTF(R, W, 1e-6, 1e-3, 'spantree');
 	m = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
 					 'algorithm', 'spantree', ...
 					 'absorbing_states', absorbing_states);
+				 pause
   end
   
   [m, time] = eval_measure('inv', pi0, r, R, W, 'debug', true, ...

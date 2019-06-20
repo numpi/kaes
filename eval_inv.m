@@ -1,5 +1,6 @@
 function [m, time, y] = eval_inv(pi0, r, R, W, absorbing_states, ...
-							  algorithm, debug, tol, ttol, shift, iterative_mult)
+							  algorithm, debug, tol, ttol, shift, ...
+							  iterative_mult, use_sinc)
 %EVAL_INV 
 
 k = length(R);
@@ -17,11 +18,6 @@ fmt = ktt_format(R{1});
 % Maximum number of steps for the iterative method of choice
 maxsteps = inf;
 
-% This value might be tweaked depending on the spectrum location of the
-% matrix R. At the moment this is done using an heuristic after calling
-% minmaxeig -- but this approach could be refined.
-expn  = 4;
-
 DeltapC = diagblocks(R, W, shift);
 Deltap = - round(ktt_kronsum(DeltapC{:}), ttol);
 
@@ -30,7 +26,7 @@ for i = 1 : size(W, 1)
 	Wsync = round(Wsync + ktt_kron(W{i,:}), ttol);
 end
 
-QQ =round(ktt_kronsum(R{:}) + Wsync, ttol);
+QQ = round(ktt_kronsum(R{:}) + Wsync, ttol);
 
 Delta = -round(diag(QQ * ktt_ones(n, fmt)), ttol);
 
@@ -70,15 +66,66 @@ if debug
 	fprintf('> dimension = %d, cond = %e \n', prod(n), cnd);
 end
 
-if cnd < 3
-    expn = 4;
-elseif cnd < 4
-    expn = 6;
+if use_sinc
+	expn = ceil(- 6 * log(ttol)/pi);
+	
+	if debug
+		fprintf('> Selecting degree of exponential sums: %d\n', expn);
+	end
 else
-	expn = 8;
+	if cnd < 3
+		expn = 4;
+	elseif cnd < 4
+		expn = 6;
+	else
+		expn = 8;
+	end
 end
 
 switch algorithm
+	
+	case 'amen'
+		timer = tic;
+		
+		Q = round(QQ + Delta + scl * S, ttol);
+		xx = amen_block_solve({ Q.' * Q }, { Q.' * r }, tol^2, 'nswp', 1000);
+		m = -dot(pi0, xx);
+		
+		res = norm(Q * xx - r) / norm(r);
+		
+		if res > tol
+			error('AMEN did not converge within the prescribed number of sweeps');
+		end
+		
+		if debug
+			fprintf('AMEN: Measure: %f\n', m);
+		end
+		
+		time = toc(timer);
+		
+	case 'dmrg'
+		timer = tic;
+		
+		Q = round(QQ + Delta + scl * S, ttol);
+		
+		% Tolerance has been experimentally adjusted to deliver reasonable
+		% results. 
+		maxswp = 100;
+		xx = dmrg_solve3(Q, r, tol * 1e-2, 'nswp', maxswp);
+		
+		res = norm(Q * xx - r) / norm(r);
+		
+		if res > tol
+			error('DMRG did not converge within the prescribed number of sweeps');
+		end
+		
+		m = -dot(pi0, xx);
+		
+		if debug
+			fprintf('DMRG: Measure: %f\n', m);
+		end
+		
+		time = toc(timer);		
 	
 	 case 'ttexpsumst'
         % MTTD Q expsums tt
@@ -145,7 +192,7 @@ switch algorithm
             y = round( y + z, ttol, maxrank ); clear('z');
 						
 			if iterative_mult
-				X = ktt_iterative_mult(X, ttol, debug);
+				X = ktt_iterative_mult(X, min(1e-1, ttol * nrmX0 / nrmX), debug);
 			else
 			    X = round( X * X, min(1e-2, ttol * nrmX0 / nrmX), maxrank );
 			end

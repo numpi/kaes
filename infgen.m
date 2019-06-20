@@ -1,4 +1,4 @@
-function [Q, M, Wsync, Rsys] = infgen(R, W, MM, tol, sp)
+function [Q, Wsync, Rsys] = infgen(R, W, tol, sp)
 %INFGEN produces the infinitesimal generator matrix
 %   Inputs: local rates matrices within cells R
 %           synchronization matrices within cells W
@@ -20,8 +20,6 @@ end
 % have the same size k
 n = length(R);
 k = arrayfun(@(i) size(R{i}, 1), 1:n);
-
-M = MM{1};
 
 for j = 2 : n
     if sp

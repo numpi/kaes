@@ -26,7 +26,9 @@ switch method
 		n = floor(n/2);
 		l = (-n:n);
 		
-		h = sqrt(2) * pi / sqrt(n);
+		alpha = 1;
+		d = 2;
+		h = sqrt(2*pi*d/alpha/n);
 		a = h ./ (1 + exp(-l*h));
 		b = log(1 + exp(l*h));
 		
