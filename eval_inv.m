@@ -1,6 +1,6 @@
 function [m, time, y] = eval_inv(pi0, r, R, W, absorbing_states, ...
 							  algorithm, debug, tol, ttol, shift, ...
-							  iterative_mult, use_sinc)
+							  iterative_mult, use_sinc, interval_report)
 %EVAL_INV 
 
 k = length(R);
@@ -150,7 +150,7 @@ switch algorithm
             oldrho = rho;
             rho = nrmY / oldnrmY;    
             err = nrmY / (1 - rho) / nrmM;
-            if debug && mod(j, 50) == 0
+            if debug && mod(j, interval_report) == 0
 				fprintf('Step %d, Neumann residue ~ %e, norm(m) = %e, erank = %f, erank y = %f, spectral radius ~ %e\n', ...
 					j, nrmY, nrmM, erank(m), erank(y), rho);
 				fprintf('Measure estimate: %e (err. estimate = %e, est. upper bound = %e)\n', ...
