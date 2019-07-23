@@ -35,7 +35,7 @@ end
 shift = 0;
 
 if strcmp(method, 'ttexpsums2')
-	shift = 1e7;
+	shift = 3e1;
 end
 
 [m, time] = eval_measure('inv', pi0, r, R, W, 'debug', true, ...

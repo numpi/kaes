@@ -35,11 +35,17 @@ A2 = round(Wsync + (Delta - Deltap), ttol);
 
 D = Deltap;
 
-% Construct the low-rank correction to implicitly deflated the absorbing states
-S = ktt_zeros(n, n, fmt);
-for i = 1 : size(absorbing_states, 1)
-	ej = ktt_ej(n, absorbing_states(i,:), fmt);
-	S = round(S + ktt_outerprod(A1*ej + A2*ej, ej), ttol);
+% Construct the low-rank correction to implicitly deflate the absorbing states
+if isa(absorbing_states, 'tt_matrix')
+	S = absorbing_states;
+	S = round(A1 * S, ttol) + round(A2 * S, ttol);
+	S = round(S, ttol);
+else
+	S = ktt_zeros(n, n, fmt);
+	for i = 1 : size(absorbing_states, 1)
+		ej = ktt_ej(n, absorbing_states(i,:), fmt);
+		S = round(S + ktt_outerprod(A1*ej + A2*ej, ej), ttol);
+	end
 end
 
 DA = R;
@@ -109,7 +115,7 @@ switch algorithm
 		% Tolerance has been experimentally adjusted to deliver reasonable
 		% results. 
 		maxswp = 100;
-		xx = dmrg_solve3(Q, r, tol * 1e-2, 'nswp', maxswp);
+		xx = dmrg_solve2(Q, r, tol * 1e-2, 'nswp', maxswp);
 		
 		res = norm(Q * xx - r) / norm(r);
 		
@@ -245,11 +251,16 @@ switch algorithm
 		fr = full(r); fpi0 = full(pi0);
 		
 		% Construct the set of indices of the absorbing states
-		abs_idx = [];
-		for j = 1 : size(absorbing_states, 1)
-			nn = cumprod(n, 'reverse');
-			abs_idx = [abs_idx, absorbing_states(j,end) + ...
-				       sum((absorbing_states(j,1:end-1)-1).*nn(2:end))];
+		if isa(absorbing_states, 'tt_matrix')
+			S = full(absorbing_states);
+			abs_idx = find(sum(S, 2) > 1e-8);
+		else
+			abs_idx = [];
+			for j = 1 : size(absorbing_states, 1)
+				nn = cumprod(n, 'reverse');
+				abs_idx = [abs_idx, absorbing_states(j,end) + ...
+						   sum((absorbing_states(j,1:end-1)-1).*nn(2:end))];
+			end
 		end
 		
 		idx = setdiff(idx, abs_idx);

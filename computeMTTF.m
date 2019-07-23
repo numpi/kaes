@@ -277,7 +277,7 @@ switch method
         
     case 'spantree'
         tic;
-        [Q, ~, ~, ~] = infgen(R, W, cell(1,1), 1e-8, true);
+        [Q, ~, ~] = infgen(R, W, 1e-8, true);
 		SR = cell(1, k); SW = cell(size(W,1), k);
 		for i = 1 : k
 			SR{i} = sparse(full(R{i}));
