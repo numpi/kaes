@@ -12,6 +12,7 @@ addOptional(p, 'shift', 0);
 addOptional(p, 'iterative_mult', false);
 addOptional(p, 'use_sinc', false);
 addOptional(p, 'interval_report', 50);
+addOptional(p, 'conditional_indices', []);
 
 parse(p, varargin{:});
 
@@ -24,6 +25,7 @@ shift = p.Results.shift;
 iterative_mult = p.Results.iterative_mult;
 use_sinc = p.Results.use_sinc;
 interval_report = p.Results.interval_report;
+conditional_indices = p.Results.conditional_indices;
 
 switch fun
 	case 'inv'
@@ -44,6 +46,7 @@ switch fun
 		% absorbing_state to condition the first in the matrix
 		% absorbing_states
 		[m, time] = eval_cond_etta(pi0, R, W, absorbing_states, ...
+								   conditional_indices, ...
 								   algorithm, debug, tol, ttol, shift, ...
 								   iterative_mult, use_sinc, interval_report);
 							   

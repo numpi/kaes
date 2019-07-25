@@ -167,7 +167,9 @@ switch algorithm
         m = m / scl;
         t = toc(timer);
         time = t;
-        fprintf('m = %e (exp sums tt), time = %f sec\n', dot(r, m), t);        
+        fprintf('m = %e (exp sums tt), time = %f sec\n', dot(r, m), t);   
+		y = m;
+		m = dot(r, m);
         
     case 'ttexpsums2'
         % MTTD Q expsums tt
