@@ -278,7 +278,7 @@ switch algorithm
 		
     case 'gmres'
         % Construct R - 
-        DeltapC = diagblocks(R, W, 0);
+        DeltapC = diagblocks(R, W, shift);
         %DeltapC = cell(1, k);
         % for j = 1 : k
         %     DeltapC{j} = tt_matrix( diag(full(R{j}) * ones(n(j), 1)) );
@@ -294,10 +294,10 @@ switch algorithm
         QQ = round(QQ - Delta, ttol);
         
         b = r;
-		kk = prod(n);
-        l = gmres(full(QQ), full(b), kk, ...
-                tol, kk, full(kronSum(DA{:}, ttol)));
-        m = -dot(full(pi0), l);
+%		kk = prod(n);
+%        l = gmres(full(QQ), full(b), kk, ...
+%                tol, kk, full(kronSum(DA{:}, ttol)));
+ %       m = -dot(full(pi0), l);
 		% keyboard
         
         % Compute minimum and maximum eigenvalues of a Kronecker sum
@@ -317,7 +317,7 @@ switch algorithm
         b = b / scl;
         
         % expinv = @(x) tt_tensor(reshape(full(-kronSum(DA{:}, ttol)) \ full(x), n));
-        expinv = @(x) -ttexpsummldivide(DA, x, 8, ttol);
+        expinv = @(x) -ttexpsummldivide(DA, x, 4, ttol);
         %DeltapB = round(Delta - kronSum(DeltapC{:}, ttol), ttol);
         %expinv = @(x) gmres_preconditioner(DA, DeltapB, x);
         

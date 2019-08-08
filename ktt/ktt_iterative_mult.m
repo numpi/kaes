@@ -29,7 +29,7 @@ X = dX;
 
 maxit = 10000;
 
-maxrank = 3; % max(5, ceil(sqrt(length(size(X)))));
+maxrank = 8; % length(size(X)); % max(5, ceil(sqrt(length(size(X)))));
 
 for j = 1 : maxit
 	nrmdX = norm(dX);
@@ -42,7 +42,7 @@ for j = 1 : maxit
 			max(rank(dX)), max(rank(M)), nrmdX^2 / nrmX^2);
 	end	
 	
-	if nrmdX^2 < nrmX^2 * ttol
+	if nrmdX^2 < nrmX^2 * ttol * 100
 		break;
 	end
 	

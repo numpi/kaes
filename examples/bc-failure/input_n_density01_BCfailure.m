@@ -69,10 +69,10 @@ if n <= 6
 end
 
 shift = 0;
-it_mult = false;
+it_mult = true;
 
 if strcmp(method, 'ttexpsums2')
-	shift = 2e6;
+	shift = 1e6;
 end
 
 [m, time] = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
