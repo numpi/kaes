@@ -144,9 +144,9 @@ switch algorithm
         
         x = x0;
         
-        j = 0;
+        nrmx0 = norm(x0);
         
-        rel_change = 1;
+        j = 0;
         
         while j < maxsteps
             j = j + 1;
@@ -167,18 +167,27 @@ switch algorithm
             % Solve the linear system M*x = l
             x = ttexpsummldivide(DA, -l, expn, ltol, expsums_method); 
             x = round(x - g * dot(en, x), ltol);
+                        
+            % Estimate the spectral radius            
+            rho = norm(x) / norm(xold);
             
             % Update the iterate
             x = x + x0;
             
-            rel_change =  norm(xold - x) / norm(x);
-            
-            if debug
-                fprintf('Step %d, rel. change %e, m = %e, ranks = %d\n', ...
-                    j, rel_change, -dot(pi0, x), max(rank(x)));
+            % Estimate for the error
+            if rho < 1
+                err_est = nrmx0 / norm(x) * rho^(j+1) / (1 - rho);
+            else
+                err_est = inf;
             end
             
-            if rel_change < tol
+            
+            if debug
+                fprintf('Step %d, err. est. = %e, m = %e, ranks = %d, rho = %e\n', ...
+                    j, err_est, -dot(pi0, x), max(rank(x)), rho);
+            end
+            
+            if err_est < tol
                 break;
             end
         end
