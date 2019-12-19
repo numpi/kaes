@@ -1,7 +1,11 @@
-function Y = ttexpsummldivide(A, B, n, tol)
+function Y = ttexpsummldivide(A, B, n, tol, method)
 %TTEXPSUMINV Compute A \ B using exponential sums. 
 
-[a,b] = expsums(n);
+if ~exist('method', 'var')
+    method = 'lag';
+end
+
+[a,b] = expsums(n, method);
 k = length(A);
 
 II = tt_matrix(expm(-b(1) * full(A{1})));

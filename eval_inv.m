@@ -88,6 +88,12 @@ else
 	end
 end
 
+if use_sinc
+    expsums_method = 'sinc';
+else
+    expsums_method = 'lag';
+end
+
 switch algorithm
 	
 	case 'amen'
@@ -106,6 +112,152 @@ switch algorithm
 		time = toc(timer);
 		
 		fprintf('m = %e (AMEn), time = %f sec\n', m, time);
+        
+    case 'tt-regular-splitting'
+        tic;
+        
+        % DA are the factors of the Kronecker sum for (gamma * eye(n) - R)
+        % Note that the sign is changed with respect to R - gamma*eye. 
+
+        en = ktt_ej(n, n, 'tt');
+        
+        % In case we need to debug
+        %M = full(ktt_kronsum(R{:})) + full(Deltap); M(:,end) = M(:,end) - full(ktt_kronsum(R{:})) * full(en);
+        %S = zeros(prod(n)); S(:,end) = full(ktt_kronsum(R{:}) + Wsync + Delta) * full(en); S(end,end) = S(end,end) + 1;
+        %N = -full(Delta) + full(Deltap) - full(Wsync) + S; N(:,end) = N(:,end) - full(ktt_kronsum(R{:})) * full(en);
+        
+        % Precompute f                
+        % f = (R - gamma * eye(prod(n))) \ R(:,end);
+        Rend = round(ktt_kronsum(R{:}) * en, ttol);
+        f = ttexpsummldivide(DA, -Rend, expn, ttol, expsums_method);        
+        g = f * (1./ (1 - dot(en, f)));
+        
+        % S = Su * Sv', Sv = en
+        Su = round(Rend + (Wsync*en) + (Delta*en), ttol);
+                
+        % x0 = M \ full(r);
+        % System to solve A \ r
+        % x = (R - gamma * eye(prod(n))) \ r; 
+        % x = x - g * x(end);
+        x0 = ttexpsummldivide(DA, -r, expn, ttol, expsums_method); 
+        x0 = round(x0 - g * dot(en, x0), ttol);
+        
+        x = x0;
+        
+        j = 0;
+        
+        rel_change = 1;
+        
+        while j < maxsteps
+            j = j + 1;
+            
+            % Adjust the truncation tolerance based on the accuracy that we
+            % have achieved as of now
+            ltol = ttol; % max(ttol, rel_change / cnd / 10);
+            
+            xold = x;
+            % x = M \ (N * x) + x0;
+            
+            % Compute l = N * x
+            l = -Wsync * x;
+            l = round(l - Delta * x + Deltap * x, ltol);
+            enx = dot(en, x);
+            l = round(l + Su * enx - Rend * enx, ltol);
+            
+            % Solve the linear system M*x = l
+            x = ttexpsummldivide(DA, -l, expn, ltol, expsums_method); 
+            x = round(x - g * dot(en, x), ltol);
+            
+            % Update the iterate
+            x = x + x0;
+            
+            rel_change =  norm(xold - x) / norm(x);
+            
+            if debug
+                fprintf('Step %d, rel. change %e, m = %e, ranks = %d\n', ...
+                    j, rel_change, -dot(pi0, x), max(rank(x)));
+            end
+            
+            if rel_change < tol
+                break;
+            end
+        end
+        
+        m = -dot(pi0, x);
+        
+        t = toc;
+        time = t;
+        fprintf('m = %e (tt-regular-splitting), time = %f sec\n', m(1), t);        
+        
+    case 'dense-splitting'
+        tic;
+        
+        % Q = full(infgen(R,W,ttol,true));
+        Delta = full(Delta);
+        R = full(ktt_kronsum(R{:}));
+        W = full(Wsync);        
+        Deltap = full(Deltap);        
+        
+        % gamma = max(1, norm(Delta, inf)) + 1;
+        % Deltap = -gamma * eye(prod(n));
+        
+        S = zeros(prod(n)); S(:,end) = R(:,end) + W(:,end) + Delta(:,end);
+        S(end,end) = S(end,end) + 1;
+        
+        % Start the iteration
+        % M = R - gamma * eye(prod(n)); M(:,end) = M(:,end) - R(:,end);
+        M = R + Deltap; M(:,end) = M(:,end) - R(:,end);
+        % N = -Delta - gamma * eye(prod(n)) - W + S; N(:,end) = N(:,end) - R(:,end);
+        N = -Delta + Deltap - W + S; N(:,end) = N(:,end) - R(:,end);
+        
+        % Precompute f
+        f = (R + Deltap) \ R(:,end);
+        g = f ./ (1 - f(end));
+        
+        % S = Su * Sv', Sv = en
+        Su = R(:,end) + W(:,end) + Delta(:,end);
+        
+        % System to solver A \ r
+        x0 = M \ full(r);
+        x = x0;
+        
+        j = 0;
+        
+        while j < maxsteps
+            j = j + 1;
+            
+            xold = x;
+            % x = M \ (N * x) + x0;
+            
+            % Compute l = N * x
+            l = -W * x;
+            % l = l - Delta * x - gamma * x;
+            l = l - Delta * x + Deltap * x;
+            l = l + Su * x(end);
+            
+            % Solve the linear system M*x = l
+            % x = (R - gamma * eye(prod(n))) \ l; 
+            x = (R + Deltap) \ l; 
+            x = x - g * x(end);    
+            
+            % Update the iterate
+            x = x + x0;
+            
+            if debug
+                fprintf('Step %d, rel. change %e, m = %e\n', ...
+                    j, norm(xold - x, 1), -dot(full(pi0), x));
+            end
+            
+            if norm(xold - x, 1) < tol
+                break;
+            end
+        end
+        
+        m = -dot(full(pi0), x);
+        
+        t = toc;
+        time = t;
+        fprintf('m = %e (dense-splitting), time = %f sec\n', m(1), t);        
 		
 	case 'dmrg'
 		timer = tic;
@@ -151,8 +303,8 @@ switch algorithm
             rho = nrmY / oldnrmY;    
             err = nrmY / (1 - rho) / nrmM;
             if debug && mod(j, interval_report) == 0
-				fprintf('Step %d, Neumann residue ~ %e, norm(m) = %e, erank = %f, erank y = %f, spectral radius ~ %e\n', ...
-					j, nrmY, nrmM, erank(m), erank(y), rho);
+				fprintf('Step %d, Neumann residue ~ %e, norm(m) = %e, rank = %f, rank y = %f, spectral radius ~ %e\n', ...
+					j, nrmY, nrmM, max(rank(m)), max(rank(y)), rho);
 				fprintf('Measure estimate: %e (err. estimate = %e, est. upper bound = %e)\n', ...
 					dot(m, r) / scl, err, dot(m, r) * (1 + err) / scl);
             end

@@ -32,7 +32,7 @@ for i = 1 : n
             W{i,j} = zeros(3,3);
             
             if i == j % flag == 0
-                W{i,j}(1,3) = lambdas(i);
+                W{i,j}(1,2) = lambdas(i);
             else
                 W{i,j} = [ 0 1 0 ; 0 1 0 ; 0 0 1 ];
             end

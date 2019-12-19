@@ -132,6 +132,8 @@ switch method
         t = toc;
         time = t;
         fprintf('m = %e (full), time = %f sec\n', -m(1), t);
+        
+
             
     case 'expsums'
 
