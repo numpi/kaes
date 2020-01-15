@@ -68,7 +68,7 @@ if n <= 6
 				 'absorbing_states', absorbing_states);
 end
 
-shift = 0;
+shift = 0.01;
 it_mult = true;
 
 if strcmp(method, 'ttexpsums2')

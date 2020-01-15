@@ -32,7 +32,7 @@ if n <= 10
 				 'absorbing_states', absorbing_states);
 end
 
-shift = 0;
+shift = 100;
 
 if strcmp(method, 'ttexpsums2')
 	shift = 3e1;

@@ -13,6 +13,7 @@ addOptional(p, 'iterative_mult', false);
 addOptional(p, 'use_sinc', false);
 addOptional(p, 'interval_report', 50);
 addOptional(p, 'conditional_indices', []);
+addOptional(p, 'x0', []);
 
 parse(p, varargin{:});
 
@@ -26,19 +27,20 @@ iterative_mult = p.Results.iterative_mult;
 use_sinc = p.Results.use_sinc;
 interval_report = p.Results.interval_report;
 conditional_indices = p.Results.conditional_indices;
+x0 = p.Results.x0;
 
 switch fun
 	case 'inv'
 		[m, time] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
-							 iterative_mult, use_sinc, interval_report);
+							 iterative_mult, use_sinc, interval_report, x0);
 	case 'inv2'
 		[~, time1, y] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
-							 iterative_mult, use_sinc, interval_report);
+							 iterative_mult, use_sinc, interval_report, x0);
 		[m, time2] = eval_inv(pi0, -y, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
-							 iterative_mult, use_sinc, interval_report);
+							 iterative_mult, use_sinc, interval_report, x0);
 		time = time1 + time2;
 	
 	case 'cond_etta'

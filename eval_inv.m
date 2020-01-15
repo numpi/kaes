@@ -1,6 +1,6 @@
 function [m, time, y] = eval_inv(pi0, r, R, W, absorbing_states, ...
 							  algorithm, debug, tol, ttol, shift, ...
-							  iterative_mult, use_sinc, interval_report)
+							  iterative_mult, use_sinc, interval_report, x0)
 %EVAL_INV 
 
 k = length(R);
@@ -132,19 +132,18 @@ switch algorithm
         f = ttexpsummldivide(DA, -Rend, expn, ttol, expsums_method);        
         g = f * (1./ (1 - dot(en, f)));
         
-        % S = Su * Sv', Sv = en
         Su = round(Rend + (Wsync*en) + (Delta*en), ttol);
                 
-        % x0 = M \ full(r);
-        % System to solve A \ r
-        % x = (R - gamma * eye(prod(n))) \ r; 
-        % x = x - g * x(end);
-        x0 = ttexpsummldivide(DA, -r, expn, ttol, expsums_method); 
-        x0 = round(x0 - g * dot(en, x0), ttol);
+        Mb = ttexpsummldivide(DA, -r, expn, ttol, expsums_method); 
+        Mb = round(Mb - g * dot(en, Mb), ttol);
+        
+        if isempty(x0)
+            x0 = Mb;
+        end
         
         x = x0;
         
-        nrmx0 = norm(x0);
+        nrmx0 = norm(Mb);
         
         j = 0;
         
@@ -172,7 +171,7 @@ switch algorithm
             rho = norm(x) / norm(xold);
             
             % Update the iterate
-            x = x + x0;
+            x = x + Mb;
             
             % Estimate for the error
             if rho < 1
@@ -193,6 +192,8 @@ switch algorithm
         end
         
         m = -dot(pi0, x);
+        
+        y = x;
         
         t = toc;
         time = t;
@@ -252,7 +253,8 @@ switch algorithm
             rho = ( norm(x) / norm(xold) )^(2^(-j+1));
             
             x = round(xold + x, ttol);
-            P = round(P * P, ttol);
+            P = P * P;
+            P = round(P, ttol);
                                     
             % Estimate for the error
             if rho < 1
@@ -275,7 +277,202 @@ switch algorithm
         
         t = toc;
         time = t;
-        fprintf('m = %e (tt-regular-splitting2), time = %f sec\n', m(1), t);                
+        fprintf('m = %e (tt-regular-splitting2), time = %f sec\n', m(1), t);            
+        
+  case 'tt-regular-splitting-hybrid'
+        tic;
+        
+        % DA are the factors of the Kronecker sum for (gamma * eye(n) - R)
+        % Note that the sign is changed with respect to R - gamma*eye. 
+
+        en = ktt_ej(n, n, 'tt');
+        
+        % In case we need to debug
+        %M = full(ktt_kronsum(R{:})) + full(Deltap); M(:,end) = M(:,end) - full(ktt_kronsum(R{:})) * full(en);
+        %S = zeros(prod(n)); S(:,end) = full(ktt_kronsum(R{:}) + Wsync + Delta) * full(en); S(end,end) = S(end,end) + 1;
+        %N = -full(Delta) + full(Deltap) - full(Wsync) + S; N(:,end) = N(:,end) - full(ktt_kronsum(R{:})) * full(en);
+        
+        % Precompute f                
+        % f = (R - gamma * eye(prod(n))) \ R(:,end);
+        Rend = round(ktt_kronsum(R{:}) * en, ttol);
+        f = ttexpsummldivide(DA, -Rend, expn, ttol, expsums_method);        
+        g = f * (1./ (1 - dot(en, f)));
+        
+        % S = Su * Sv', Sv = en
+        Su = round(Rend + (Wsync*en) + (Delta*en), ttol);
+                
+        % x0 = M \ full(r);
+        % System to solve A \ r
+        % x = (R - gamma * eye(prod(n))) \ r; 
+        % x = x - g * x(end);
+        x0 = ttexpsummldivide(DA, -r, expn, ttol, expsums_method); 
+        x0 = round(x0 - g * dot(en, x0), ttol);
+        
+        x = x0;        
+        nrmx0 = norm(x0);
+        
+        % Compute the iteration matrix P = M \ N
+        N = ktt_outerprod(Su, en);
+        N = round(N - ktt_outerprod(Rend, en), ttol);
+        N = round(N - Delta + Deltap, ttol);
+        N = round(N - Wsync, ttol);
+        
+        P = ttexpsummldivide(DA, -N, expn, ttol, expsums_method); 
+        P = round(P - ktt_outerprod(g, P'*en), ttol);
+        
+        j = 0;
+        
+        while j < maxsteps
+            j = j + 1;
+            
+            xold = x;
+            
+            x = round(P * x, ttol);
+            
+            % Estimate the spectral radius            
+            rho = ( norm(x) / norm(xold) )^(2^(-j+1));
+            
+            x = round(xold + x, ttol, 100);
+            P = round(P * P, ttol, 10);
+                                    
+            % Estimate for the error
+            if rho < 1
+                err_est = nrmx0 / norm(x) * rho^(2^j+1) / (1 - rho);
+            else
+                err_est = inf;
+            end            
+            
+            if debug
+                fprintf('Step %d, err. est. = %e, m = %e, ranks = %d (x), %d (P), rho = %e\n', ...
+                    j, err_est, -dot(pi0, x), max(rank(x)), max(rank(P)), rho);
+            end
+            
+            if err_est < tol
+                break;
+            end
+        end
+        
+        % m = -dot(pi0, x);
+        
+        % Refine with the standard iteration
+        m = eval_inv(pi0, r, R, W, absorbing_states, ...
+                  'tt-regular-splitting', debug, tol, ttol, shift, ...
+                  iterative_mult, use_sinc, interval_report, x);
+        
+        t = toc;
+        time = t;
+        fprintf('m = %e (tt-regular-splitting-hybrid), time = %f sec\n', m(1), t);        
+        
+  case 'tt-regular-splitting-iterative-refinement'
+        tic;
+        
+        % DA are the factors of the Kronecker sum for (gamma * eye(n) - R)
+        % Note that the sign is changed with respect to R - gamma*eye. 
+
+        en = ktt_ej(n, n, 'tt');
+        
+        % In case we need to debug
+        %M = full(ktt_kronsum(R{:})) + full(Deltap); M(:,end) = M(:,end) - full(ktt_kronsum(R{:})) * full(en);
+        %S = zeros(prod(n)); S(:,end) = full(ktt_kronsum(R{:}) + Wsync + Delta) * full(en); S(end,end) = S(end,end) + 1;
+        %N = -full(Delta) + full(Deltap) - full(Wsync) + S; N(:,end) = N(:,end) - full(ktt_kronsum(R{:})) * full(en);
+        
+        % Precompute f                
+        % f = (R - gamma * eye(prod(n))) \ R(:,end);
+        Rend = round(ktt_kronsum(R{:}) * en, ttol);
+        f = ttexpsummldivide(DA, -Rend, expn, ttol, expsums_method);        
+        g = f * (1./ (1 - dot(en, f)));
+        
+        % S = Su * Sv', Sv = en
+        Su = round(Rend + (Wsync*en) + (Delta*en), ttol);
+        
+        b = r;
+        xf = ktt_zeros(n);
+        
+        %M = full(ktt_kronsum(R{:})) + full(Deltap); M(:,end) = M(:,end) - full(ktt_kronsum(R{:})) * full(en);        
+        M = round(ktt_kronsum(R{:}) + Deltap - ktt_outerprod(ktt_kronsum(R{:}) * en, en), ttol);
+        
+        % Compute the iteration matrix P = M \ N
+        N = ktt_outerprod(Su, en);
+        N = round(N - ktt_outerprod(Rend, en), ttol);
+        N = round(N - Delta + Deltap, ttol);
+        N = round(N - Wsync, ttol);        
+            
+        P = ttexpsummldivide(DA, -N, expn, ttol, expsums_method); 
+        P = round(P - ktt_outerprod(g, P'*en), ttol);        
+        
+        Pstart = P;
+        
+        ltol = ttol;
+        ltol = 1e-4; % tol;
+            
+        for jj = 1 : 10
+                
+            % x0 = M \ full(r);
+            % System to solve A \ r
+            % x = (R - gamma * eye(prod(n))) \ r; 
+            % x = x - g * x(end);
+            x0 = ttexpsummldivide(DA, -b, expn, ltol, expsums_method); 
+            x0 = round(x0 - g * dot(en, x0), ltol);
+            x = x0;        
+            nrmx0 = norm(x0);
+            
+            P = Pstart;
+                       
+            j = 0;
+
+            while j < maxsteps
+                j = j + 1;
+
+                xold = x;
+
+                x = round(P * x, ltol);
+
+                % Estimate the spectral radius            
+                nrmred = norm(x) / norm(xold);
+                rho = ( nrmred )^(2^(-j+1));
+                
+                ltol = ttol; % min(tol, max(ttol, 1 - nrmred))
+
+                x = round(xold + x, ltol);
+                P = round(P * P, ltol);
+
+                % Estimate for the error
+                if rho < 1
+                    err_est = nrmx0 / norm(x) * rho^(2^j+1) / (1 - rho);
+                else
+                    err_est = inf;
+                end            
+
+                if debug
+                    fprintf('Step %d, err. est. = %e, m = %e, ranks = %d (x), %d (P), rho = %e\n', ...
+                        j, err_est, -dot(pi0, x) - dot(pi0, xf), max(rank(x)), max(rank(P)), rho);
+                end
+
+                if err_est < tol
+                    break;
+                end
+            end
+            
+            % Compute new b and update x
+            if jj == 1
+                xf = x;
+            else
+                xf = round(xf + x, ttol);
+            end
+            
+            b = round(r - M * xf + N * xf + ktt_outerprod(Rend, en) * xf + ktt_outerprod(en, en) * xf, ltol);
+            
+            if norm(x) < norm(xf) * tol
+                break;
+            end
+            
+        end
+        
+        m = -dot(pi0, xf);
+        
+        t = toc;
+        time = t;
+        fprintf('m = %e (tt-regular-splitting-iterative-refinement), time = %f sec\n', m(1), t);        
         
     case 'dense-splitting'
         tic;
