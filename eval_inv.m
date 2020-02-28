@@ -1,6 +1,7 @@
 function [m, time, y] = eval_inv(pi0, r, R, W, absorbing_states, ...
 							  algorithm, debug, tol, ttol, shift, ...
-							  iterative_mult, use_sinc, interval_report, x0)
+							  iterative_mult, use_sinc, ...
+                              interval_report, x0, anderson)
 %EVAL_INV 
 
 k = length(R);
@@ -120,6 +121,8 @@ switch algorithm
         % Note that the sign is changed with respect to R - gamma*eye. 
 
         en = ktt_ej(n, n, 'tt');
+
+        Q = infgen(R, W, tol, false);
         
         % In case we need to debug
         %M = full(ktt_kronsum(R{:})) + full(Deltap); M(:,end) = M(:,end) - full(ktt_kronsum(R{:})) * full(en);
@@ -147,6 +150,11 @@ switch algorithm
         
         j = 0;
         
+        % Data for Anderson acceleration
+        if anderson
+            DXX = []; DFF = []; xa = x; res_a = inf; nrmr = norm(r);
+        end
+        
         while j < maxsteps
             j = j + 1;
             
@@ -173,20 +181,40 @@ switch algorithm
             % Update the iterate
             x = x + Mb;
             
+            % Use Anderson acceleration, if enabled
+            if anderson
+                ka = 3;
+                [xa, DXX, DFF] = ttanders(xold, x, ka, 1.0, ttol, DXX, DFF);            
+                
+                % Compute Anderson residual
+                res_a = norm(Q * xa - r) / nrmr;
+            else
+                res_a = inf;
+            end
+            
             % Estimate for the error
             if rho < 1
                 err_est = nrmx0 / norm(x) * rho^(j+1) / (1 - rho);
             else
                 err_est = inf;
-            end
-            
+            end            
             
             if debug
-                fprintf('Step %d, err. est. = %e, m = %e, ranks = %d, rho = %e\n', ...
-                    j, err_est, -dot(pi0, x), max(rank(x)), rho);
+                if anderson
+                    fprintf('Step %d, err. est. = %e, m = %e (Anderson: %e / res = %e), ranks = %d, rho = %e \n', ...
+                        j, err_est, -dot(pi0, x), -dot(pi0, xa), res_a, max(rank(x)), rho);
+                else
+                    fprintf('Step %d, err. est. = %e, m = %e, ranks = %d, rho = %e\n', ...
+                        j, err_est, -dot(pi0, x), max(rank(x)), rho);
+                end
             end
             
             if err_est < tol
+                break;
+            end
+            
+            if res_a < tol
+                x = xa;
                 break;
             end
         end
@@ -714,7 +742,7 @@ switch algorithm
         fprintf('m = %e (span tree), time = %f sec\n', m, t);
 		
     case 'gmres'
-        % Construct R - 
+        % Construct R  
         DeltapC = diagblocks(R, W, shift);
         %DeltapC = cell(1, k);
         % for j = 1 : k

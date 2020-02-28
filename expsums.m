@@ -31,6 +31,24 @@ switch method
 		h = sqrt(2*pi*d/alpha/n);
 		a = h ./ (1 + exp(-l*h));
 		b = log(1 + exp(l*h));
+        
+    case 'sinc2'
+        n = floor(n/2);
+        l = (-n:n);
+        
+        alpha = 1;
+        d = 3*pi/4;
+        h = sqrt(2*pi*d/alpha/n);
+		a = h ./ (1 + exp(-l*h));
+		b = log(1 + exp(l*h));
+        
+    case 'fourier'
+        l = (1 : n);
+        h = pi / (n+1);
+        
+        t = -pi/2 + l .* h;
+        a = h ./ (1 + exp(tan(t))) ./ (cos(t).^2);
+        b = log(1 + exp(-tan(t)));
 		
 end
 

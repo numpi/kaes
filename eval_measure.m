@@ -14,6 +14,7 @@ addOptional(p, 'use_sinc', false);
 addOptional(p, 'interval_report', 50);
 addOptional(p, 'conditional_indices', []);
 addOptional(p, 'x0', []);
+addOptional(p, 'anderson', false);
 
 parse(p, varargin{:});
 
@@ -28,19 +29,20 @@ use_sinc = p.Results.use_sinc;
 interval_report = p.Results.interval_report;
 conditional_indices = p.Results.conditional_indices;
 x0 = p.Results.x0;
+anderson = p.Results.anderson;
 
 switch fun
 	case 'inv'
 		[m, time] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
-							 iterative_mult, use_sinc, interval_report, x0);
+							 iterative_mult, use_sinc, interval_report, x0, anderson);
 	case 'inv2'
 		[~, time1, y] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
-							 iterative_mult, use_sinc, interval_report, x0);
+							 iterative_mult, use_sinc, interval_report, x0, anderson);
 		[m, time2] = eval_inv(pi0, -y, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
-							 iterative_mult, use_sinc, interval_report, x0);
+							 iterative_mult, use_sinc, interval_report, x0, anderson);
 		time = time1 + time2;
 	
 	case 'cond_etta'

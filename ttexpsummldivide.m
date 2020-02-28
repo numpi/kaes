@@ -12,20 +12,25 @@ end
 [a,b] = expsums(n, method);
 k = length(A);
 
-II = tt_matrix(expm(-b(1) * full(A{1})));
-for i = 2 : k
-    II = tkron(tt_matrix(expm(-b(1) * full(A{i}))), II);
+% Replace A with the cell array of dense matrices
+for i = 1 : k
+    A{i} = full(A{i});
 end
 
-Y = a(1) * II * B;
+II = cell(1, k);
+for i = 1 : k
+    II{i} = expm(-b(1) * A{i});
+end
+
+Y = a(1) * tt_mul_kron(II, B);
 
 for j = 2 : n
-    II = tt_matrix(expm(-b(j) * full(A{1})));
-    for i = 2 : k
-        II = tkron(tt_matrix(expm(-b(j) * full(A{i}))), II);
+    for i = 1 : k
+        II{i} = expm(-b(j) * A{i});
     end
 
-    Y = round(Y + a(j) * II * B, tol, rmax);
+    Y = Y + a(j) * tt_mul_kron(II, B);
+    Y = round(Y, tol, rmax);
 end
 
 
