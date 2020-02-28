@@ -122,7 +122,6 @@ switch algorithm
 
         en = ktt_ej(n, n, 'tt');
 
-        Q = infgen(R, W, tol, false);
         
         % In case we need to debug
         %M = full(ktt_kronsum(R{:})) + full(Deltap); M(:,end) = M(:,end) - full(ktt_kronsum(R{:})) * full(en);
@@ -151,8 +150,11 @@ switch algorithm
         j = 0;
         
         % Data for Anderson acceleration
-        if anderson
-            DXX = []; DFF = []; xa = x; res_a = inf; nrmr = norm(r);
+        if anderson        
+            % Q is only needed in case we want to compute the residual
+            % during Anderson acceleration. 
+            Q = infgen(R, W, tol, false);
+            DXX = []; DFF = []; xa = x; nrmr = norm(r);
         end
         
         while j < maxsteps
