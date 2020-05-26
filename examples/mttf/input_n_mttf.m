@@ -1,8 +1,12 @@
-function time = input_n_mttf(n, method, topology, it_mult)
+function time = input_n_mttf(n, method, topology, anderson)
 %INPUT_N_MTTF 
 
 if ~exist('it_mult', 'var')
 	it_mult = false;
+end
+
+if ~exist('anderson', 'var')
+    anderson = false;
 end
 
 %  topology = full((eye(n,n)+sprand(n,n, 1 / n)) > 0)
@@ -42,8 +46,7 @@ end
 					   'algorithm', method, 'shift', shift, ...
 					   'absorbing_states', absorbing_states, ...
 					   'ttol', 1e-10, 'tol', 1e-3, ...
-					   'iterative_mult', it_mult, 'use_sinc', true, 'anderson', true);
-				   
+					   'iterative_mult', it_mult, 'use_sinc', true, 'anderson', anderson);
 % pause
 % [m, time] = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
 %    'algorithm', 'ttexpsumst', 'shift', 0, ...
