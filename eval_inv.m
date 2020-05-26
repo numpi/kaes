@@ -101,12 +101,12 @@ switch algorithm
 		timer = tic;
 		
 		Q = round(QQ + Delta + scl * S, ttol);
-		xx = amen_block_solve({ Q.' * Q }, { Q.' * r }, tol^2, 'nswp', 1000);
+		xx = amen_block_solve({ Q }, { r }, ttol, 'nswp', 1000);
 		m = -dot(pi0, xx);
 		
 		res = norm(Q * xx - r) / norm(r);
 		
-		if res > tol
+		if res > ttol
 			error('AMEN did not converge within the prescribed number of sweeps');
 		end
 		
