@@ -100,19 +100,37 @@ switch algorithm
 	case 'amen'
 		timer = tic;
 		
-		Q = round(QQ + Delta + scl * S, ttol);
-		xx = amen_block_solve({ Q }, { r }, ttol, 'nswp', 1000);
+		Q = round(QQ + Delta - scl * S, ttol);
+		xx = amen_block_solve({ Q }, { r }, ttol, 'nswp', 1000, 'tol_exit', tol);
 		m = -dot(pi0, xx);
 		
 		res = norm(Q * xx - r) / norm(r);
 		
-		if res > ttol
+		if res > tol
 			error('AMEN did not converge within the prescribed number of sweeps');
 		end
 		
 		time = toc(timer);
 		
 		fprintf('m = %e (AMEn), time = %f sec\n', m, time);
+        
+    case 'ament'
+        timer = tic;
+        
+        % We use R{:} as a preconditioner
+        Qt = round(QQ + Delta - scl * S, ttol)';
+        
+        xx = amen_block_solve({ Qt }, { pi0 }, ttol, 'nswp', 1000, 'tol_exit', tol);
+		m = -dot(r, xx);
+		
+		%res = norm(Qt * xx - rt) / norm(rt);
+        
+        %if res > tol
+		%	error('AMEN did not converge within the prescribed number of sweeps');
+        %end		
+        
+        time = toc(timer);
+		fprintf('m = %e (AMEn + exp sums), time = %f sec\n', m, time);
         
     case 'tt-regular-splitting'
         tic;
