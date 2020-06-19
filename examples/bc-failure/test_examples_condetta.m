@@ -9,7 +9,7 @@ k = 1;
 acc_times = [];
 
 for j = 1 : k
-    acc_times = [ acc_times, input_n_density01_BCfailure(N, method, ...
+    acc_times = [ acc_times, input_n_density01_BCfailure_condetta(N, method, ...
 				  full((eye(N)+sprand(N,N,.5/N)) > 0)) ];
 end
 

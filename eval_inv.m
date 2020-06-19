@@ -111,6 +111,7 @@ switch algorithm
 		end
 		
 		time = toc(timer);
+        y = xx;
 		
 		fprintf('m = %e (AMEn), time = %f sec\n', m, time);
         
