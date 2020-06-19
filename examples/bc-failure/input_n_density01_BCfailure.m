@@ -42,10 +42,12 @@ lambdaEP_min = 1;
 lambdaEP_max = 1.5;
 lambdaEP = lambdaEP_min + (lambdaEP_max-lambdaEP_min)*rand(n,1)
 
+pp = symrcm(topology);
+disp(topology(pp,pp));
   
 % Construct Rs and Ws
-[R, W] = BCfailure(n, topology, lambdaB, lambdaC, lambdaD, ...
-	lambdaW, lambdaE, lambdaEP, pC, pD, pEP);
+[R, W] = BCfailure(n, topology(pp, pp), lambdaB(pp), lambdaC(pp), lambdaD(pp), ...
+	lambdaW(pp), lambdaE(pp), lambdaEP(pp), pC, pD, pEP);
 
 P = eye(5); P(1:3,1:3) = 0;
 w = cell(1, n);
