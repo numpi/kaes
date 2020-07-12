@@ -1,8 +1,8 @@
 function time = varying_pC_BCfailure_mean_tta_and_variance(method)
 
-n = 10;% number of components
+n = 3;% number of components
 
-nchanges = 20;% number of different value of pC between 0 and 1-pEP
+nchanges = 5;% number of different value of pC between 0 and 1-pEP
 
 %  topology = full((eye(n,n)+sprand(n,n, 1 / n)) > 0)
 topology = createTopology(n, 0.2, 'starnoloops');
@@ -62,7 +62,7 @@ end
 % Compute the measure
 pEP = 0.2222;
 
-results = zeros(nchanges,3);
+results = zeros(nchanges+1,3);
 
 for k = 0 : nchanges
     pC = k/nchanges*(1-pEP);
@@ -82,7 +82,7 @@ for k = 0 : nchanges
                            'ttol', 1e-10, 'tol', 1e-4, ...
                            'iterative_mult', it_mult, 'use_sinc', true, ...
                            'interval_report', 10);
-    results(k,:) = [pC, mtta, var];
+    results(k+1,:) = [pC, mtta, var];
 end
 
 fprintf("pC\tMTTF\tVar\n");
