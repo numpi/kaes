@@ -44,6 +44,16 @@ switch fun
 							 algorithm, debug, tol, ttol, shift, ...
 							 iterative_mult, use_sinc, interval_report, x0, anderson);
 		time = time1 + time2;
+    
+    case 'tta_variance'
+        [m1, time1, y] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
+							 algorithm, debug, tol, ttol, shift, ...
+							 iterative_mult, use_sinc, interval_report, x0, anderson);
+		[m2, time2] = eval_inv(pi0, -y, R, W, absorbing_states, ...
+							 algorithm, debug, tol, ttol, shift, ...
+							 iterative_mult, use_sinc, interval_report, x0, anderson);
+        m = m2 - m1^2;
+		time = time1 + time2;
 	
 	case 'cond_etta'
 		% Conditional expected time to absorption: we select as
