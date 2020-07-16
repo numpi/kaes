@@ -5,9 +5,8 @@ n = 3;% number of components
 nchanges = 5;% number of different value of pC between 0 and 1-pEP
 
 %  topology = full((eye(n,n)+sprand(n,n, 1 / n)) > 0)
-topology = createTopology(n, 0.2, 'starnoloops');
-
 rng(2)
+topology = createTopology(n, 0.2, 'starnoloops');
 
 disp(topology);
 
@@ -70,6 +69,16 @@ for k = 0 : nchanges
     % Construct Rs and Ws
     [R, W] = BCfailure(n, topology(pp, pp), lambdaB(pp), lambdaC(pp), lambdaD(pp), ...
         lambdaW(pp), lambdaE(pp), lambdaEP(pp), pC, pD, pEP);
+    
+    % Debug
+%     Q = infgen(R, W, 1e-8, true);
+%     tt = find(sum(full(abs(Q)), 2) == 0);
+%     tau = setdiff(1:size(Q,1), tt);
+%     Qt = Q(tau, tau);
+%     fpi0 = eye(size(Qt, 1), 1);
+%     fr = ones(size(Qt, 1), 1);
+%     m1 = - fpi0' * (Qt \ fr);
+    
     [mtta, time] = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
                            'algorithm', method, 'shift', shift, ...
                            'absorbing_states', absorbing_states, ...
@@ -85,7 +94,7 @@ for k = 0 : nchanges
     results(k+1,:) = [pC, mtta, var];
 end
 
-fprintf("pC\tMTTF\tVar\n");
+fprintf("pC\t\tMTTF\t\tVar\n");
 fprintf("%f\t%f\t%f\n", results');
                    
 end

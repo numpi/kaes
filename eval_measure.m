@@ -52,7 +52,7 @@ switch fun
 		[m2, time2] = eval_inv(pi0, -y, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
 							 iterative_mult, use_sinc, interval_report, x0, anderson);
-        m = m2 - m1^2;
+        m = 2*m2 - m1^2;
 		time = time1 + time2;
 	
 	case 'cond_etta'
