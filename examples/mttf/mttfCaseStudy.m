@@ -1,11 +1,13 @@
-function [R, W, M] = mttfCaseStudy(n, topology, lambdah, lambdahp, lambdas)
+function [R, W, M] = mttfCaseStudy(n, topology, lambdah, lambdahp, lambdas, lambdasl, mu)
 %LARGEMODEL produces matrices R and W and markings M
 %   INPUTS: n:        number of system components,
 %           topology: adjacency matrix of the attack propagation graph
-%           lambdah:   vector of constant rates for the hardware failure
-%           lambdahp:   vector of constant rates for the hardware failure
-%                       when the software has failed.
-%           lambdas:       vector of constant rates for the software failure
+%           lambdah:  vector of constant rates for the hardware failure
+%           lambdahp: vector of constant rates for the hardware failure
+%                     when the software has failed.
+%           lambdas:  vector of constant rates for the software failure
+%           lambdasl: vector of constant rates of local failure for the software 
+%           mu:       recovery rates
 
 % Check dimension
 if size(topology) ~= [n, n]
@@ -18,8 +20,11 @@ W = cell(n, n);
 M = cell(1,n);
 
 for i = 1 : n
-    R{i} = zeros(3,3);
-    R{i}(1:2,3) = [ lambdah(i); lambdahp(i) ];
+%     R{i} = zeros(3,3);
+%     R{i}(1:2,3) = [ lambdah(i); lambdahp(i) ];
+    R{i} = [0     lambdasl(i) lambdah(i);
+            mu(i) 0           lambdahp(i);
+            0     0           0];
     M{i} = [1 1 ;
             1 0 ;
             0 0];

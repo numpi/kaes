@@ -58,10 +58,11 @@ for i = 1 : size(W, 1)
     %    D{j} = D{j} + diag(W{i,j} * tt_ones(n(j), 1));
     %end
     % shift = 100 * max(norm(D{i}), norm(M)) * tt_matrix(eye(size(D{i}))) / size(W, 2);
-    D{1} = round(D{1} + M, 1e-8);
+%     D{1} = round(D{1} + M, 1e-8);
 end
 
 for i = 1 : k
+    D{i} = tt_matrix(eye(size(D{i}))) / k * max(nrm,1);
     shift = shift_param * nrm * tt_matrix(eye(size(D{i}))) / k;
     D{i} = D{i} + shift;
 end

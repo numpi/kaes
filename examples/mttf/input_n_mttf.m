@@ -14,14 +14,18 @@ if ~exist('topology', 'var')
     topology = createTopology(n, 0.2, 'starnoloops');
 end
 
+param = 0.01;
+
 lambdah = 0.1 * (1 : n);
 lambdahp = (1 : n);
-lambdas = (1 : n);
+lambdas = param*(1 : n);
+lambdasl = (1 : n);
+mu = 10*n*ones(1,n);
 
 pp = symrcm(topology);
 
 [R, W, ~] = mttfCaseStudy(n, topology(pp, pp), lambdah(pp), ...
-	lambdahp(pp), lambdas(pp));
+	lambdahp(pp), lambdas(pp), lambdasl(pp), mu(pp));
 
 absorbing_states = 3 * ones(1, n);
 

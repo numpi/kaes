@@ -1,6 +1,6 @@
 function time = varying_pC_BCfailure_mean_tta_and_variance(method)
 
-n = 10;% number of components
+n = 6;% number of components
 
 nchanges = 20;% number of different value of pC between 0 and 1-pEP
 
