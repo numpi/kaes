@@ -544,6 +544,8 @@ switch algorithm
         % N = -Delta - gamma * eye(prod(n)) - W + S; N(:,end) = N(:,end) - R(:,end);
         N = -Delta + Deltap - W + S; N(:,end) = N(:,end) - R(:,end);
         
+        fprintf('spectral radious=1-%e\n',1-max(abs(eig(M\N))));
+        
         % Precompute f
         f = (R + Deltap) \ R(:,end);
         g = f ./ (1 - f(end));

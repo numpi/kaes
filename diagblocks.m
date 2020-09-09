@@ -42,10 +42,17 @@ for j = 1 : k
     nrm = nrm + max(abs(full(diag(D{j}))));
 end
 
-for j = 1 : k
-    for i = 1 : size(W, 1)
-        nrm = nrm + max(abs(full(diag(W{i,j}))));
+% for j = 1 : k
+%     for i = 1 : size(W, 1)
+%         nrm = nrm + max(abs(full(diag(W{i,j}))));
+%     end
+% end 
+for i = 1 : size(W, 1)
+    nrmw = 1;
+    for j = 1 : k
+        nrmw = nrmw* norm(full(W{i,j}), inf);
     end
+    nrm = nrm + nrmw;
 end 
 
 for i = 1 : size(W, 1)

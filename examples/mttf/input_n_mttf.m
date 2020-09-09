@@ -10,7 +10,7 @@ if ~exist('anderson', 'var')
 end
 
 %  topology = full((eye(n,n)+sprand(n,n, 1 / n)) > 0)
-if ~exist('topology', 'var')
+if ~exist('topology', 'var') || isempty(topology)
     topology = createTopology(n, 0.2, 'starnoloops');
 end
 
@@ -20,7 +20,7 @@ lambdah = 0.1 * (1 : n);
 lambdahp = (1 : n);
 lambdas = param*(1 : n);
 lambdasl = (1 : n);
-mu = 10*n*ones(1,n);
+mu = zeros(1,n);%100*n*ones(1,n);
 
 pp = symrcm(topology);
 
