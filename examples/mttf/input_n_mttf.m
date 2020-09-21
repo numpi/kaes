@@ -1,11 +1,11 @@
-function time = input_n_mttf(n, method, topology, anderson)
+function time = input_n_mttf(n, method, topology, anderson, param)
 %INPUT_N_MTTF 
 
 if ~exist('it_mult', 'var')
 	it_mult = false;
 end
 
-if ~exist('anderson', 'var')
+if ~exist('anderson', 'var') || isempty(anderson)
     anderson = false;
 end
 
@@ -14,7 +14,9 @@ if ~exist('topology', 'var') || isempty(topology)
     topology = createTopology(n, 0.2, 'starnoloops');
 end
 
-param = 0.01;
+if ~exist('param', 'var')
+    param = 0.01;
+end
 
 lambdah = 0.1 * (1 : n);
 lambdahp = (1 : n);
