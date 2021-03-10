@@ -14,10 +14,6 @@ lambdaB_min = 100;
 lambdaB_max = 200;
 lambdaB = lambdaB_min + (lambdaB_max-lambdaB_min)*rand(n,1)
 
-lambdaC_min = 0.1;
-lambdaC_max = 0.2;
-lambdaC = lambdaC_min + (lambdaC_max-lambdaC_min)*rand(n,1)
-
 lambdaD_min = 1;
 lambdaD_max = 1.5;
 lambdaD = lambdaD_min + (lambdaD_max-lambdaD_min)*rand(n,1)
@@ -58,17 +54,16 @@ if strcmp(method, 'ttexpsums2')
 	shift = 1e6;
 end
 
-% Compute the measure
-pEP = 0.2222;
-
 results = zeros(nchanges+1,3);
 
 for k = 0 : nchanges
-    pC = k/nchanges*(1-pEP);
-    pD = 1-pC-pEP;
+    lambdaC_min = 0.1+k*0.05;
+    lambdaC_max = 0.2+k*0.05;
+    lambdaC = lambdaC_min + (lambdaC_max-lambdaC_min)*rand(n,1)
+    
     % Construct Rs and Ws
     [R, W] = BCfailure(n, topology(pp, pp), lambdaB(pp), lambdaC(pp), lambdaD(pp), ...
-        lambdaW(pp), lambdaE(pp), lambdaEP(pp), pC, pD, pEP);
+        lambdaW(pp), lambdaE(pp), lambdaEP(pp));
     
     % Debug
 %     Q = infgen(R, W, 1e-8, true);
