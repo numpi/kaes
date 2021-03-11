@@ -26,8 +26,7 @@ M = cell(1,n);
 for i = 1 : n
     R{i} = zeros(5,5);
 	R{i}(1,2) = lambdaE(i);
-    R{i}(2,3) = pD*lambdaD(i);
-%     R{i}(2,4) = pC*lambdaC(i);
+    R{i}(2,3) = lambdaD(i);
     R{i}(3,1) = lambdaW(i);
     R{i}(3,5) = lambdaB(i);
     M{i} = eye(5,5);
@@ -39,7 +38,7 @@ for i = 1 : n
         if topology(i,j)
             W{i,j} = zeros(5,5);
             if i == j
-                W{i,j}(2,2) = pEP*lambdaEP(i);
+                W{i,j}(2,2) = lambdaEP(i);
             else
                 W{i,j} = eye(5,5);
 				W{i,j}(1:3,1:3) = 0; 

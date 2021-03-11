@@ -1,34 +1,27 @@
-function time = varying_pC_BCfailure_mean_tta_and_variance(method)
+function time = example_varying_pC_BCfailure_mean_tta_and_variance(method)
 
 n = 6;% number of components
 
 nchanges = 0;% number of different value of pC between 0 and 1-pEP
 
-%  topology = full((eye(n,n)+sprand(n,n, 1 / n)) > 0)
-rng(2)
-topology = createTopology(n, 0.2, 'starnoloops');
+topology = [1 0 0 0 0 0;
+            1 1 0 0 0 0;
+            1 0 1 0 0 0;
+            1 1 0 1 0 0;
+            1 0 0 0 1 0;
+            1 0 0 0 0 1];
 
 disp(topology);
 
-lambdaB_min = 100;
-lambdaB_max = 200;
-lambdaB = lambdaB_min + (lambdaB_max-lambdaB_min)*rand(n,1)
+lambdaB = 100*ones(n,1)
 
-lambdaD_min = 1;
-lambdaD_max = 1.5;
-lambdaD = lambdaD_min + (lambdaD_max-lambdaD_min)*rand(n,1)
+lambdaD = 10*ones(n,1)
 
-lambdaW_min = 1;
-lambdaW_max = 1.5;
-lambdaW = lambdaW_min + (lambdaW_max-lambdaW_min)*rand(n,1)
+lambdaW = 100*ones(n,1)
 
-lambdaE_min = 1;
-lambdaE_max = 1.5;
-lambdaE = lambdaE_min + (lambdaE_max-lambdaE_min)*rand(n,1)
+lambdaE = ones(n,1)
 
-lambdaEP_min = 1;
-lambdaEP_max = 1.5;
-lambdaEP = lambdaEP_min + (lambdaEP_max-lambdaEP_min)*rand(n,1)
+lambdaEP = 5*ones(n,1)
 
 pp = symrcm(topology);
 disp(topology(pp,pp));
@@ -57,9 +50,10 @@ end
 results = zeros(nchanges+1,3);
 
 for k = 0 : nchanges
-    lambdaC_min = 0.1+k*0.05;
-    lambdaC_max = 0.2+k*0.05;
-    lambdaC = lambdaC_min + (lambdaC_max-lambdaC_min)*ones(n,1)
+%     lambdaC_min = 0.1+k*0.05;
+%     lambdaC_max = 0.2+k*0.05;
+%     lambdaC = lambdaC_min + (lambdaC_max-lambdaC_min)*ones(n,1)
+    lambdaC = 0.15*ones(n,1)
     
     % Construct Rs and Ws
     [R, W] = BCfailure(n, topology(pp, pp), lambdaB(pp), lambdaC(pp), lambdaD(pp), ...
