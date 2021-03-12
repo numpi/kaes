@@ -1,23 +1,33 @@
 function time = example_varying_pC_BCfailure_mean_tta_and_variance(method)
 
-n = 6;% number of components
-
 nchanges = 0;% number of different value of pC between 0 and 1-pEP
 
-topology = [1 0 0 0 0 0;
-            1 1 0 0 0 0;
-            1 0 1 0 0 0;
-            1 1 0 1 0 0;
-            1 0 0 0 1 0;
-            1 0 0 0 0 1];
+% n = 6;% number of components
+% 
+% isDelta = [1 0 0 0 0 0;
+%             1 1 0 0 0 0;
+%             1 0 1 0 0 0;
+%             1 1 0 1 0 0;
+%             1 0 0 0 1 0;
+%             1 0 0 0 0 1];
+% topology = [1 1 1 1 1 1;
+%             0 0 0 1 0 0;
+%             0 0 0 0 0 0;
+%             0 0 0 0 0 0;
+%             0 0 0 0 0 0;
+%             0 0 0 0 0 0];
+
+n = 2;
+topology = [1 1
+            0 0];
 
 disp(topology);
 
-lambdaB = 100*ones(n,1)
+lambdaB = 18*ones(n,1)
 
 lambdaD = 10*ones(n,1)
 
-lambdaW = 100*ones(n,1)
+lambdaW = 342*ones(n,1)
 
 lambdaE = ones(n,1)
 
@@ -27,6 +37,8 @@ pp = symrcm(topology);
 disp(topology(pp,pp));
 
 P = eye(5); P(1:3,1:3) = 0;
+
+
 w = cell(1, n);
 for j = 1 : n
 	w{j} = tt_matrix(P);
@@ -53,7 +65,7 @@ for k = 0 : nchanges
 %     lambdaC_min = 0.1+k*0.05;
 %     lambdaC_max = 0.2+k*0.05;
 %     lambdaC = lambdaC_min + (lambdaC_max-lambdaC_min)*ones(n,1)
-    lambdaC = 0.15*ones(n,1)
+    lambdaC = 0.41665e-3*ones(n,1)
     
     % Construct Rs and Ws
     [R, W] = BCfailure(n, topology(pp, pp), lambdaB(pp), lambdaC(pp), lambdaD(pp), ...

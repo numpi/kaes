@@ -727,7 +727,7 @@ switch algorithm
 		d = Q * ktt_ones(n, 'sparse'); Q = Q - spdiags(d, 0, prod(n), prod(n));
 		
 		% Find the reachable states by walking on the graph
-		G = digraph(abs(Q) > 1e-3, 'omitselfloops');
+		G = digraph(abs(Q) > 1e-5, 'omitselfloops');
         G = shortestpathtree(G, 1);
         G = graph(G.Edges, G.Nodes);
         t = minspantree(G, 'Root', 1);
