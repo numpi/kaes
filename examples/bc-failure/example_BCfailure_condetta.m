@@ -7,7 +7,7 @@ function time = example_BCfailure_condetta(method)
 
 nchanges = 0;% number of different value of pC between 0 and 1-pEP
 
-% n = 6;% number of components
+n = 6;% number of components
 
 % {{true,false,false,false,false,false},
 % {true,true,false,false,false,false},
@@ -21,16 +21,16 @@ nchanges = 0;% number of different value of pC between 0 and 1-pEP
 %             1 1 0 1 0 0;
 %             1 0 0 0 1 0;
 %             1 0 0 0 0 1];
-% topology = [1 1 1 1 1 1;
-%             0 0 0 1 0 0;
-%             0 0 0 0 0 0;
-%             0 0 0 0 0 0;
-%             0 0 0 0 0 0;
-%             0 0 0 0 0 0];
+topology = [1 1 1 1 1 1;
+            0 0 0 1 0 0;
+            0 0 0 0 0 0;
+            0 0 0 0 0 0;
+            0 0 0 0 0 0;
+            0 0 0 0 0 0];
 
-n = 2;
-topology = [1 1
-            0 0];
+% n = 2;
+% topology = [1 1
+%             0 0];
         
 disp(topology);
 
@@ -44,7 +44,7 @@ lambdaE = ones(n,1)
 
 lambdaEP = 5*ones(n,1)
 
-lambdaC = 0.41665e-3*ones(n,1)
+lambdaC = 0.041665*ones(n,1)
   
 % Construct Rs and Ws
 [R, W] = BCfailure(n, topology, lambdaB, lambdaC, lambdaD, ...
@@ -66,11 +66,10 @@ w = cell(1, n); for j = 1 : n; w{j} = tt_tensor(v); end
 r = round(ktt_ones(5*ones(1,n)) - ktt_kron(w{:}), 1e-8);
 
 % C is 4-th, B is 5-th, state
-conditional_indices = 4 * ones(1, n);
-% conditional_indices = 5 * ones(1, n);
+% conditional_indices = 4 * ones(1, n);
+conditional_indices = 5 * ones(1, n);
 
 % conditional_indices = [4 5];
-
 % conditional_indices = [5 4];
 
 % % Compute the measure

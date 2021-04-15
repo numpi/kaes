@@ -2,7 +2,7 @@ function time = example_varying_pC_BCfailure_mean_tta_and_variance(method)
 
 nchanges = 0;% number of different value of pC between 0 and 1-pEP
 
-% n = 6;% number of components
+n = 6;% number of components
 % 
 % isDelta = [1 0 0 0 0 0;
 %             1 1 0 0 0 0;
@@ -10,16 +10,16 @@ nchanges = 0;% number of different value of pC between 0 and 1-pEP
 %             1 1 0 1 0 0;
 %             1 0 0 0 1 0;
 %             1 0 0 0 0 1];
-% topology = [1 1 1 1 1 1;
-%             0 0 0 1 0 0;
-%             0 0 0 0 0 0;
-%             0 0 0 0 0 0;
-%             0 0 0 0 0 0;
-%             0 0 0 0 0 0];
+topology = [1 1 1 1 1 1;
+            0 0 0 1 0 0;
+            0 0 0 0 0 0;
+            0 0 0 0 0 0;
+            0 0 0 0 0 0;
+            0 0 0 0 0 0];
 
-n = 2;
-topology = [1 1
-            0 0];
+% n = 2;
+% topology = [1 1
+%             0 0];
 
 disp(topology);
 
@@ -65,7 +65,7 @@ for k = 0 : nchanges
 %     lambdaC_min = 0.1+k*0.05;
 %     lambdaC_max = 0.2+k*0.05;
 %     lambdaC = lambdaC_min + (lambdaC_max-lambdaC_min)*ones(n,1)
-    lambdaC = 0.41665e-3*ones(n,1)
+    lambdaC = 0.041665*ones(n,1)
     
     % Construct Rs and Ws
     [R, W] = BCfailure(n, topology(pp, pp), lambdaB(pp), lambdaC(pp), lambdaD(pp), ...
