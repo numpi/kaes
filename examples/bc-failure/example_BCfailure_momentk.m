@@ -1,4 +1,4 @@
-function time = example_BCfailure_condetta(method)
+function time = example_BCfailure_momentk(method)
 %
 % Constructs the example decribed in the paper "New Method for 
 % the Evaluation of (Conditional) Time To Failure and its Moments
@@ -8,6 +8,7 @@ function time = example_BCfailure_condetta(method)
 nchanges = 0;% number of different value of pC between 0 and 1-pEP
 
 n = 6;% number of components
+k = 2;
 
 % {{true,false,false,false,false,false},
 % {true,true,false,false,false,false},
@@ -72,8 +73,7 @@ r = round(ktt_ones(5*ones(1,n)) - ktt_kron(w{:}), 1e-8);
 
 % C is 4-th, B is 5-th, state
 % conditional_indices = 4 * ones(1, n);
-% conditional_indices = 5 * ones(1, n);
-conditional_indices = [ 5 * ones(1, n); 4 * ones(1, n) ];
+conditional_indices = 5 * ones(1, n);
 
 % conditional_indices = [4 5];
 % conditional_indices = [5 4];
@@ -93,13 +93,15 @@ if strcmp(method, 'ttexpsums2')
 	shift = 2e6;
 end
 
-[m, time] = eval_measure('cond_etta', pi0, r, R, W, 'debug', true, ...
+[m, time] = eval_measure('momentk', pi0, r, R, W, 'debug', true, 'moment', k, ...
 					   'algorithm', method, 'shift', shift, ...
 					   'absorbing_states', absorbing_states, ...
 					   'conditional_indices', conditional_indices, ...
 					   'ttol', 1e-10, 'tol', 1e-4, ...
 					   'iterative_mult', it_mult, 'use_sinc', false, ...
 					   'interval_report', 10);
+                   
+fprintf('Measure = %e\n', m);
 
 end
 

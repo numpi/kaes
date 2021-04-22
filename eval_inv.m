@@ -102,6 +102,7 @@ switch algorithm
 		
 		Q = round(QQ + Delta - scl * S, ttol);
 		xx = amen_block_solve({ Q }, { r }, ttol, 'nswp', 1000, 'tol_exit', tol);
+        xx = round(xx, ttol);
 		m = -dot(pi0, xx);
 		
 		res = norm(Q * xx - r) / norm(r);

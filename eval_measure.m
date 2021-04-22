@@ -15,6 +15,8 @@ addOptional(p, 'interval_report', 50);
 addOptional(p, 'conditional_indices', []);
 addOptional(p, 'x0', []);
 addOptional(p, 'anderson', false);
+addOptional(p, 'moment', 0);
+addOptional(p, 'batch_size', inf);
 
 parse(p, varargin{:});
 
@@ -30,6 +32,8 @@ interval_report = p.Results.interval_report;
 conditional_indices = p.Results.conditional_indices;
 x0 = p.Results.x0;
 anderson = p.Results.anderson;
+moment = p.Results.moment;
+batch_size = p.Results.batch_size;
 
 switch fun
 	case 'inv'
@@ -44,6 +48,23 @@ switch fun
 							 algorithm, debug, tol, ttol, shift, ...
 							 iterative_mult, use_sinc, interval_report, x0, anderson);
 		time = time1 + time2;
+        
+    case 'momentk'
+        y = rewards;
+        time = 0.0;
+        for j = 1 : moment
+            [m, tm, y] = eval_inv(pi0, y, R, W, absorbing_states, ...
+                algorithm, debug, tol, ttol, shift, ...
+				iterative_mult, use_sinc, interval_report, x0, anderson);
+            
+            if j < moment
+                y = round(rewards .* y, ttol);
+            end
+            
+            time = time + tm;
+        end
+        
+        m = factorial(moment) * (-1)^(moment+1) * m;
     
     case 'tta_variance'
         [m1, time1, y] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
@@ -62,12 +83,12 @@ switch fun
 		[m, time] = eval_cond_etta(pi0, R, W, absorbing_states, ...
 								   conditional_indices, ...
 								   algorithm, debug, tol, ttol, shift, ...
-								   iterative_mult, use_sinc, interval_report);
+								   iterative_mult, use_sinc, interval_report, batch_size);
 							   
 		if debug
 			fprintf('EVAL_MEASURE :: cond_etta :: measure = %e\n', m);
 			fprintf('EVAL_MEASURE :: cond_etta :: time    = %f\n', time);
-		end
+        end
 		
 	otherwise
 		error('Unsupported measure');
