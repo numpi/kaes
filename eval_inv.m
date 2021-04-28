@@ -1,7 +1,7 @@
 function [m, time, y] = eval_inv(pi0, r, R, W, absorbing_states, ...
 							  algorithm, debug, tol, ttol, shift, ...
 							  iterative_mult, use_sinc, ...
-                              interval_report, x0, anderson)
+                              interval_report, x0, anderson, max_full_size)
 %EVAL_INV 
 
 k = length(R);
@@ -100,8 +100,10 @@ switch algorithm
 	case 'amen'
 		timer = tic;
 		
+        x0 = ttexpsummldivide(DA, -r, expn, ttol, expsums_method);
 		Q = round(QQ + Delta - scl * S, ttol);
-		xx = amen_block_solve({ Q }, { r }, ttol, 'nswp', 1000, 'tol_exit', tol);
+		xx = amen_block_solve({ Q }, { r }, min(tol, 1e-8), ...
+            'nswp', 1000, 'tol_exit', tol, 'kickrank', 4, 'x0', x0, 'max_full_size', max_full_size);
         xx = round(xx, ttol);
 		m = -dot(pi0, xx);
 		

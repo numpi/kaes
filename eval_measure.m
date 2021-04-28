@@ -17,6 +17,7 @@ addOptional(p, 'x0', []);
 addOptional(p, 'anderson', false);
 addOptional(p, 'moment', 0);
 addOptional(p, 'batch_size', inf);
+addOptional(p, 'max_full_size', 16000);
 
 parse(p, varargin{:});
 
@@ -34,19 +35,20 @@ x0 = p.Results.x0;
 anderson = p.Results.anderson;
 moment = p.Results.moment;
 batch_size = p.Results.batch_size;
+max_full_size = p.Results.max_full_size;
 
 switch fun
 	case 'inv'
 		[m, time] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
-							 iterative_mult, use_sinc, interval_report, x0, anderson);
+							 iterative_mult, use_sinc, interval_report, x0, anderson, max_full_size);
 	case 'inv2'
 		[~, time1, y] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
-							 iterative_mult, use_sinc, interval_report, x0, anderson);
+							 iterative_mult, use_sinc, interval_report, x0, anderson, max_full_size);
 		[m, time2] = eval_inv(pi0, -y, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
-							 iterative_mult, use_sinc, interval_report, x0, anderson);
+							 iterative_mult, use_sinc, interval_report, x0, anderson, max_full_size);
 		time = time1 + time2;
         
     case 'momentk'
@@ -55,7 +57,7 @@ switch fun
         for j = 1 : moment
             [m, tm, y] = eval_inv(pi0, y, R, W, absorbing_states, ...
                 algorithm, debug, tol, ttol, shift, ...
-				iterative_mult, use_sinc, interval_report, x0, anderson);
+				iterative_mult, use_sinc, interval_report, x0, anderson, max_full_size);
             
             if j < moment
                 y = round(rewards .* y, ttol);
@@ -69,7 +71,7 @@ switch fun
     case 'tta_variance'
         [m1, time1, y] = eval_inv(pi0, rewards, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
-							 iterative_mult, use_sinc, interval_report, x0, anderson);
+							 iterative_mult, use_sinc, interval_report, x0, anderson, max_full_size);
 		[m2, time2] = eval_inv(pi0, -y, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
 							 iterative_mult, use_sinc, interval_report, x0, anderson);
@@ -83,7 +85,7 @@ switch fun
 		[m, time] = eval_cond_etta(pi0, R, W, absorbing_states, ...
 								   conditional_indices, ...
 								   algorithm, debug, tol, ttol, shift, ...
-								   iterative_mult, use_sinc, interval_report, batch_size);
+								   iterative_mult, use_sinc, interval_report, batch_size, max_full_size);
 							   
 		if debug
 			fprintf('EVAL_MEASURE :: cond_etta :: measure = %e\n', m);

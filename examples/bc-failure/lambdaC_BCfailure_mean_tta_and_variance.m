@@ -73,7 +73,7 @@ lambdaC = (k+1)*0.041665*ones(n,1);
                        'interval_report', 10);
 results = [lambdaC(1), mtta, var, timemtta, timevar];
 
-fprintf("lambdaC\t\tMTTF\t\tVar\t\tTimeMTTA\tTimeVAR\n");
+fprintf("lambdaC\t\tMTTA\t\tVar\t\tTimeMTTA\tTimeVAR\n");
 fprintf("%f\t%f\t%f\t%f\t%f\n", results');
 
 time = timemtta + timevar;
