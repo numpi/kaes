@@ -74,7 +74,7 @@ switch fun
 							 iterative_mult, use_sinc, interval_report, x0, anderson, max_full_size);
 		[m2, time2] = eval_inv(pi0, -y, R, W, absorbing_states, ...
 							 algorithm, debug, tol, ttol, shift, ...
-							 iterative_mult, use_sinc, interval_report, x0, anderson);
+							 iterative_mult, use_sinc, interval_report, x0, anderson, max_full_size);
         m = 2*m2 - m1^2;
 		time = time1 + time2;
 	
