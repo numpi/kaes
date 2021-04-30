@@ -1,4 +1,4 @@
-function time = lambdaC_BCfailure_moments_tta(method, k)
+function time = lambdaC_BCfailure_moments_Yr(method, k)
 
 n = 6;% number of components
 
@@ -41,7 +41,7 @@ absorbing_states = ktt_kron(w{:});
 
 pi0 = ktt_ej(5*ones(1,n), ones(1,n));
 
-v = [ 0 ; 0 ; 0 ; 1 ; 1 ];
+v = [ -2 ; 0 ; -1 ; 1 ; 1 ];
 w = cell(1, n); for j = 1 : n; w{j} = tt_tensor(v); end
 
 r = round(ktt_ones(5*ones(1,n)) - ktt_kron(w{:}), 1e-8);
