@@ -96,7 +96,17 @@ else
 end
 
 switch algorithm
-	
+    
+    case 'full-tt'
+        time = tic;
+        Q = full(QQ + Delta - scl * S);
+        xx = Q \ full(r);
+        xx = tt_tensor(xx, ttol, size(r));
+        m = -dot(pi0, xx);
+        time = toc(time);
+        y = xx;
+    	fprintf('m = %e (Full-TT), time = %f sec, ranks = %d\n', m, time, rank(xx));
+
 	case 'amen'
 		timer = tic;
 		
