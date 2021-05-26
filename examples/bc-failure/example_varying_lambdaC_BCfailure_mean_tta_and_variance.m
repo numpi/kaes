@@ -37,8 +37,6 @@ pp = symrcm(topology);
 disp(topology(pp,pp));
 
 P = eye(5); P(1:3,1:3) = 0;
-
-
 w = cell(1, n);
 for j = 1 : n
 	w{j} = tt_matrix(P);
