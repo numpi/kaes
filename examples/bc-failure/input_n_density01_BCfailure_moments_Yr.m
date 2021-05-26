@@ -30,6 +30,7 @@ lambdaEP_max = 1.1;
 lambdaEP = lambdaEP_min + (lambdaEP_max-lambdaEP_min)*rand(n,1)
 
 setup_case_study;
+setup_r_Yr;
 
 [m1, timem1] = eval_measure('momentk', pi0, r, R, W, 'debug', true, ...
                        'algorithm', method, ...

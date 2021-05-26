@@ -2,7 +2,6 @@ function time = lambdaC_BCfailure_moments_tta(method, k)
 
 n = 6;% number of components
 
-
 lambdaB_min = 18;
 lambdaB_max = 20;
 lambdaB = lambdaB_min + (lambdaB_max-lambdaB_min)*rand(n,1)
