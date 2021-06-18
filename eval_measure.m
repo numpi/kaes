@@ -60,7 +60,14 @@ switch fun
 				iterative_mult, use_sinc, interval_report, x0, anderson, max_full_size);
             
             if j < moment
-                y = round(rewards .* y, ttol);
+                % FIXME: We should probably check if the method is using
+                % TT-vectors or not -- spantree may not be the only
+                % exception. 
+                if ~strcmp(algorithm, 'spantree')
+                    y = round(rewards .* y, ttol);
+                else
+                    y = full(rewards) .* full(y);
+                end
             end
             
             time = time + tm;

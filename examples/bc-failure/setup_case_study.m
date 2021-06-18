@@ -2,7 +2,7 @@
 rng(2)
 
 % Tolerances
-ttol = 1e-10;
+ttol = 1e-12;
 tol = 1e-4;
 
 %  topology = full((eye(n,n)+sprand(n,n, 1 / n)) > 0)
