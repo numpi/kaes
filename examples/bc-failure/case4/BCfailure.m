@@ -31,6 +31,7 @@ for i = 1 : n
         R{i}(1,2) = 2*lambdaE(i);
         R{i}(2,3) = lambdaD(i);
         R{i}(2,4) = lambdaE(i);
+        R{i}(3,1) = lambdaW(i);
         R{i}(4,5) = 2*lambdaD(i);
         R{i}(5,2) = lambdaW(i);
         R{i}(5,6) = lambdaD(i);
@@ -47,6 +48,7 @@ for i = 1 : n
         R{i}(1,2) = 2*lambdaE(i);
         R{i}(2,3) = lambdaD(i);
         R{i}(2,4) = lambdaE(i);
+        R{i}(3,1) = lambdaW(i);
         R{i}(4,5) = 2*lambdaD(i);
         R{i}(5,2) = lambdaW(i);
         R{i}(5,6) = lambdaD(i);
@@ -85,8 +87,11 @@ for i = 1 : n
             
             if i == j
                 W{i,j}(2,2) = lambdaEP(i);
-                W{i,j}(4,4) = lambdaEP(i);
+                W{i,j}(4,4) = 2*lambdaEP(i);
                 W{i,j}(5,5) = lambdaEP(i);
+                if j>l
+                    W{i,j}(9,9) = lambdaEP(i);
+                end
             else
                 if j <= l
                     W{i,j} = zeros(7,7);
@@ -129,12 +134,12 @@ for i = n+1 : 2*n
 
         % TODO
         if i-n == j
-            W{i,j}(1,7) = lambdaC(i-n);
-            W{i,j}(2,7) = lambdaC(i-n);
-            W{i,j}(3,7) = lambdaC(i-n);
-            W{i,j}(4,7) = lambdaC(i-n);
-            W{i,j}(5,7) = lambdaC(i-n);
-            W{i,j}(6,7) = lambdaC(i-n);
+            W{i,j}(1,7) = 2*lambdaC(i-n);
+            W{i,j}(2,7) = 2*lambdaC(i-n);
+            W{i,j}(3,7) = 2*lambdaC(i-n);
+            W{i,j}(4,7) = 2*lambdaC(i-n);
+            W{i,j}(5,7) = 2*lambdaC(i-n);
+            W{i,j}(6,7) = 2*lambdaC(i-n);
             if j>l
                 W{i,j}(8,11) = lambdaC(i-n);
                 W{i,j}(9,11) = lambdaC(i-n);
