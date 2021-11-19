@@ -16,7 +16,7 @@ load('topology', 'T');
 topology = T(1:n, 1:n);
 xx = rand(n-1,1) > .5;
 % yy = rand(n-1,1) > .5;
-topology = eye(n) + diag(xx .* ones(n-1,1),1) + diag(ones(n-1,1),-1);
+% topology = eye(n) + diag(xx .* ones(n-1,1),1) + diag(ones(n-1,1),-1);
 topology = topology > 0;
 
 disp(topology);
