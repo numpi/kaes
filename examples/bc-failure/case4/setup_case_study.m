@@ -26,8 +26,7 @@ l = 0;% when there is a catastrofic failure we cannot consider the presence of
 % some componets with just one absorbing state
 
 % Construct Rs and Ws
-[R, W] = BCfailure(n, topology, lambdaB, lambdaC, lambdaD, ...
-	lambdaW, lambdaE, lambdaEP, l);
+[R, W] = BCfailure(n, topology, eta, zeta, lambdaR, lambdaD, lambdaE, lambdaEP, l);
 
 P = eye(5); P(1:3,1:3) = 0;
 w = cell(1, n);
