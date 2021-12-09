@@ -3,8 +3,7 @@ function time = lambdaC_BCfailure_mean_tta_and_variance(method, k)
 n = 6;% number of components
 
 setup_rates
-% TODO
-lambdaR = (k+1)*0.041665*ones(n,1);
+lambdaR = (k+1)*0.05*ones(n,1);
     
 setup_case_study;
         
@@ -17,9 +16,9 @@ setup_case_study;
                        'absorbing_states', absorbing_states, ...
                        'ttol', ttol, 'tol', tol);
                    
-results = [lambdaC(1), mtta, var, timemtta, timevar];
+results = [lambdaR(1), mtta, var, timemtta, timevar];
 
-fprintf("lambdaC\t\tMTTA\t\tVar\t\tTimeMTTA\tTimeVAR\n");
+fprintf("lambdaR\t\tMTTA\t\tVar\t\tTimeMTTA\tTimeVAR\n");
 fprintf("%f\t%f\t%f\t%f\t%f\n", results');
 
 time = timemtta + timevar;

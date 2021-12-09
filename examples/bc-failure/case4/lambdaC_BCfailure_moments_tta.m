@@ -2,9 +2,8 @@ function time = lambdaC_BCfailure_moments_tta(method, k)
 
 n = 6;% number of components
 
-% TODO
 setup_rates;
-lambdaR = (k+1)*0.041665*ones(n,1);
+lambdaR = (k+1)*0.05*ones(n,1);
 
 setup_case_study;
 
