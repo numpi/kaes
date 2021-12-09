@@ -14,9 +14,9 @@ lambdaD_min = 0.013;
 lambdaD_max = 0.015;
 lambdaD = lambdaD_min + (lambdaD_max-lambdaD_min)*rand(n,1)
 
-% 0.002 (once every 500 hours)
-lambdaE_min = 0.0015;
-lambdaE_max = 0.0025;
+% 0.000114 (once every year)
+lambdaE_min = 0.0001135;
+lambdaE_max = 0.0001145;
 lambdaE = lambdaE_min + (lambdaE_max-lambdaE_min)*rand(n,1)
 
 % 0.015 (little less than once every 3 days)

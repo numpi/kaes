@@ -4,7 +4,7 @@ n = 6;% number of components
 
 setup_rates;
 
-lambdaR = (k+1)*0.041665*ones(n,1);
+lambdaR = (k+1)*0.05*ones(n,1);
     
 setup_case_study;
         

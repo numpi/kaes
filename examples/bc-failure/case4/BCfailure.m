@@ -137,16 +137,16 @@ for i = n+1 : 2*n
         end
 
         if i-n == j
-            W{i,j}(1,4) = 2*lambdaC(i-n);
-            W{i,j}(2,4) = 2*lambdaC(i-n);
-            W{i,j}(3,4) = 2*lambdaC(i-n);
-            W{i,j}(5,4) = 2*lambdaC(i-n);
-            W{i,j}(6,4) = 2*lambdaC(i-n);
-            W{i,j}(7,4) = 2*lambdaC(i-n);
+            W{i,j}(1,4) = 2*(1-eta)*lambdaD(i-n);
+            W{i,j}(2,4) = 2*(1-eta)*lambdaD(i-n);
+            W{i,j}(3,4) = 2*(1-eta)*lambdaD(i-n);
+            W{i,j}(5,4) = 2*(1-eta)*lambdaD(i-n);
+            W{i,j}(6,4) = 2*(1-eta)*lambdaD(i-n);
+            W{i,j}(7,4) = 2*(1-eta)*lambdaD(i-n);
             if j>l
-                W{i,j}(8,12) = lambdaC(i-n);
-                W{i,j}(9,12) = lambdaC(i-n);
-                W{i,j}(10,12) = lambdaC(i-n);
+                W{i,j}(8,12) = (1-eta)*lambdaD(i-n);
+                W{i,j}(9,12) = (1-eta)*lambdaD(i-n);
+                W{i,j}(10,12) = (1-eta)*lambdaD(i-n);
             end
         else
             W{i,j}(1,4) = 1;

@@ -14,10 +14,10 @@ end
 % ones. 
 load('topology', 'T');
 topology = T(1:n, 1:n);
-xx = rand(n-1,1) > .5;
-% yy = rand(n-1,1) > .5;
-topology = eye(n) + diag(xx .* ones(n-1,1),1) + diag(ones(n-1,1),-1);
-topology = topology > 0;
+% xx = rand(n-1,1) > .5;
+% % yy = rand(n-1,1) > .5;
+% topology = eye(n) + diag(xx .* ones(n-1,1),1) + diag(ones(n-1,1),-1);
+% topology = topology > 0;
 
 disp(topology);
 
@@ -26,8 +26,8 @@ l = 0;% when there is a catastrofic failure we cannot consider the presence of
 % some componets with just one absorbing state
 
 % Construct Rs and Ws
-[R, W] = BCfailure(n, topology, lambdaB, lambdaC, lambdaD, ...
-	lambdaW, lambdaE, lambdaEP, l);
+[R, W] = BCfailure(n, topology, eta, zeta, lambdaR, lambdaD, ...
+	lambdaE, lambdaEP, l);
 
 P = eye(5); P(1:3,1:3) = 0;
 w = cell(1, n);

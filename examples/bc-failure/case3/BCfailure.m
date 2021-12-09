@@ -1,9 +1,10 @@
-function [R, W, M] = BCfailure(n, topology, lambdaB, lambdaC, lambdaD, lambdaW, lambdaE, lambdaEP, l)
+function [R, W, M] = BCfailure(n, topology, eta, zeta, lambdaR, lambdaD, lambdaE, lambdaEP, l)
 %BCFAILURE produces matrices R and W and markings M
 %   INPUTS: n:        number of system components,
 %           topology: adjacency matrix of the failure propagation graph
-%           lambdaB:  benign component failure rates
-%           lambdaC:  catastrofic component failure rate
+%           eta: 
+%           zeta:
+%           lambdaR:  
 %           lambdaD:  component failure detection rate
 %           lambdaW:  component recovery rate
 %           lambdaEP: failure propagation rate
@@ -27,17 +28,17 @@ for i = 1 : n
     if i <= l
         R{i} = zeros(4,4);
         R{i}(1,2) = lambdaE(i);
-        R{i}(2,3) = lambdaD(i);
-        R{i}(3,1) = lambdaW(i);
-        %R{i}(2,4) = lambdaC(i);
+        R{i}(2,3) = eta*lambdaD(i);
+        R{i}(3,1) = zeta*lambdaR(i);
+        %R{i}(2,4) = (1-eta)*lambdaD(i);
         M{i} = eye(4,4);
     else        
         R{i} = zeros(5,5);
         R{i}(1,2) = lambdaE(i);
         R{i}(2,3) = lambdaD(i);
-        R{i}(3,1) = lambdaW(i);
-        R{i}(3,5) = lambdaB(i);
-        %R{i}(2,4) = lambdaC(i);
+        R{i}(3,1) = zeta*lambdaR(i);
+        R{i}(3,5) = (1-zeta)*lambdaR(i);
+        %R{i}(2,4) = (1-eta)*lambdaD(i);
         M{i} = eye(5,5);
     end
 end
@@ -79,7 +80,7 @@ for i = n+1 : 2*n
     for j = 1 : n
            W{i,j} = zeros(5,5);
            if i-n == j
-               W{i,j}(2,4) = lambdaC(i-n);
+               W{i,j}(2,4) = (1-eta)*lambdaD(i-n);
             else
                 W{i,j} = eye(5,5);
 				W{i,j}(1:3,1:3) = 0; 
