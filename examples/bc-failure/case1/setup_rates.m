@@ -1,24 +1,25 @@
 % TODO set parameters   
 
-eta = 0.1;
-zeta = 0.1;
+eta = 0.995
 
-lambdaR_min = 18;
-lambdaR_max = 20;
+zeta = 0.2
+
+% 0.5 (once every 2 hours)
+lambdaR_min = 0.45;
+lambdaR_max = 0.55;
 lambdaR = lambdaR_min + (lambdaR_max-lambdaR_min)*rand(n,1)
 
-lambdaD_min = 9;
-lambdaD_max = 11;
+% 0.014 (about once every 72 hours)
+lambdaD_min = 0.013;
+lambdaD_max = 0.015;
 lambdaD = lambdaD_min + (lambdaD_max-lambdaD_min)*rand(n,1)
 
-lambdaW_min = 320;
-lambdaW_max = 350;
-lambdaW = lambdaW_min + (lambdaW_max-lambdaW_min)*rand(n,1)
-
-lambdaE_min = 1;
-lambdaE_max = 1.5;
+% 0.002 (once every 500 hours)
+lambdaE_min = 0.0015;
+lambdaE_max = 0.0025;
 lambdaE = lambdaE_min + (lambdaE_max-lambdaE_min)*rand(n,1)
 
-lambdaEP_min = 0.9;
-lambdaEP_max = 1.1;
+% 0.0014 (about once every month)
+lambdaEP_min = 0.0013;
+lambdaEP_max = 0.0015;
 lambdaEP = lambdaEP_min + (lambdaEP_max-lambdaEP_min)*rand(n,1)
