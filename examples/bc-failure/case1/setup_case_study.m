@@ -25,8 +25,8 @@ disp(topology);
 l = ceil(n/2);
 
 % Construct Rs and Ws
-[R, W] = BCfailure(n, topology, lambdaB, lambdaC, lambdaD, ...
-	lambdaW, lambdaE, lambdaEP, l);
+[R, W] = BCfailure(n, topology, eta, zeta, lambdaR, lambdaD, ...
+	lambdaE, lambdaEP, l);
 
 P = eye(5); P(1:3,1:3) = 0;
 w = cell(1, n);
