@@ -19,7 +19,7 @@ lambdaE_min = 0.0015;
 lambdaE_max = 0.0025;
 lambdaE = lambdaE_min + (lambdaE_max-lambdaE_min)*rand(n,1)
 
-% 0.0014 (about once every month)
-lambdaEP_min = 0.0013;
-lambdaEP_max = 0.0015;
+% 0.015 (little less than once every 3 days)
+lambdaEP_min = 0.013;
+lambdaEP_max = 0.017;
 lambdaEP = lambdaEP_min + (lambdaEP_max-lambdaEP_min)*rand(n,1)

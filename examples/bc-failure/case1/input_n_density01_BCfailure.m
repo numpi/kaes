@@ -21,7 +21,7 @@ disp(topology(pp,pp));
   
 % Construct Rs and Ws
 [R, W] = BCfailure(n, topology(pp, pp), eta, zeta, lambdaR(pp), lambdaD(pp), ...
-	lambdaW(pp), lambdaE(pp), lambdaEP(pp));
+	lambdaE(pp), lambdaEP(pp), 0);
 
 P = eye(5); P(1:3,1:3) = 0;
 w = cell(1, n);
