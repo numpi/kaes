@@ -37,11 +37,11 @@ w = cell(1, n); for j = 1 : n; w{j} = tt_tensor(v); end
 r = round(ktt_ones(5*ones(1,n)) - ktt_kron(w{:}), 1e-8);
 
 % Compute the measure
-if n <= 6
-	m = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
-				 'algorithm', 'spantree', ...
-				 'absorbing_states', absorbing_states);
-end
+% if n <= 6
+% 	m = eval_measure('inv', pi0, r, R, W, 'debug', true, ...
+% 				 'algorithm', 'spantree', ...
+% 				 'absorbing_states', absorbing_states);
+% end
 
 shift = 0.01;
 it_mult = true;
